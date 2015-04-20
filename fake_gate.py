@@ -31,15 +31,10 @@ class Gate(object):
 		if(out_dim == 0):
 			return np.zeros(self.input_dimensions)
 		elif(out_dim > self.input_dimensions):
-			# this is the problem and I'm not sure how to fix it right now
 			out_dim = self.input_dimensions
-
-		#print("output")
-		calculated = self.input_vals.reshape((self.inputs, self.input_dimensions))[self.gate_vals>0].reshape(out_dim*self.input_dimensions)
-		#print("done")
-		ipdb.set_trace()
-		return calculated
-		#return self.input_vals
+			self.input_vals.reshape((self.inputs, self.input_dimensions))[np.where(self.gate_vals>0)[0][0]].reshape(out_dim*self.input_dimensions)
+		else:
+			return self.input_vals.reshape((self.inputs, self.input_dimensions))[self.gate_vals>0].reshape(out_dim*self.input_dimensions)
 
 
 def fake_gate(inputs, input_dimensions):
