@@ -5,15 +5,27 @@ class FakeBG(object):
 	def __init__(self, dimensions, threshold):
 		# the gate values, starting with the first
 		self.state = np.zeros(dimensions)
-		self.state[0] = 1
+		self.state_index = 0
+		self.state[self.state_index] = 1
 		# the accumulated reward
 		self.reward = 0
+		self.threshold = threshold
+		self.crossed = False
 
 	def reward_input(self, t, x):
 		"""mess with this later"""
+		self.reward += x
 		# if the reward passes the threshold, mark it
 		# if the reward drops from the threshold, change the state
-
+		if(self.reward > self.threshold):
+			self.crossed = True
+		elif(self.reward < self.threshold and self.crossed == True)
+			self.crossed = False
+			self.reward = True
+			# state stuff
+			self.state = np.zeros(dimensions)
+			self.state_index = (state_index + 1) % dimensions
+			self.state[self.state_index] = 1
 
 	def gate_output(self, t):
 		return self.state
