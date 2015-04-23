@@ -21,7 +21,7 @@ class FakeBG(object):
 			self.crossed = True
 		elif(self.reward < self.threshold and self.crossed == True)
 			self.crossed = False
-			self.reward = True
+			self.reward = 0
 			# state stuff
 			self.state = np.zeros(dimensions)
 			self.state_index = (state_index + 1) % dimensions

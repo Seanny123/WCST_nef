@@ -1,4 +1,4 @@
-# combinatorics library
+import itertools
 
 class Card(object):
 	def __init__(self, shape, colour, number):
@@ -6,12 +6,32 @@ class Card(object):
 		self.colour = colour
 		self.number = number
 
+	def __str__(self):
+		return "%s,%s,%s" %(self.shape, self.colour, self.number)
+
+	def __repr__(self):
+		return "Card:%s,%s,%s" %(self.shape, self.colour, self.number)
+
 class WCST(object):
 	def __init__(self):
-		colours = ""
+		colours = ["GREEN", "RED", "YELLOW", "BLUE"]
+		numbers = ["ONE", "TWO", "THREE", "FOUR"]
+		shapes = ["STAR", "CIRCLE", "TRIANGLE", "PLUS"]
 		# create a deck full of cards
-		# create the displayed cards
+		disp = [("ONE","TRIANGLE","RED"), ("TWO","STAR","GREEN"), ("THREE","PLUS","YELLOW"), ("FOUR","CIRCLE","BLUE")]
+		self.displayed = []
+		deck = []
+		for card in itertools.product(numbers, shapes, colours):
+			# get the displayed cards
+			for d in disp:
+				if(card == d):
+					self.displayed.append(card)
+					break
+				else:
+					deck.append(Card(*card))
+
 		# get the trial card
+		self.trial = deck.pop
 		# initialize settings
 		self.rule_list = ["colour", "shape", "number"]
 		self.last_rule = ""
@@ -37,7 +57,7 @@ class WCST(object):
 		self.persev = 0
 
 	def get_displayed(self):
-		"""get the currently displayed cards"""
+		"""get the currently displayed cards, not actually used since the similarity network has them hard-coded at the moment"""
 		return self.displayed
 
 	def get_trial(self):
@@ -66,7 +86,7 @@ class WCST(object):
 
 		if(self.run_num >= self.run_length):
 			self.last_rule = self.rule
-			self.rule = #HOW TO GENERATE RULE?
+			#self.rule = #HOW TO GENERATE RULE?
 			self.run_num = 0
 			self.cat_num +=1
 
@@ -85,3 +105,4 @@ class WCST(object):
 		return feedback
 
 	def write_result(self):
+		print("result")

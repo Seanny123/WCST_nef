@@ -14,14 +14,10 @@ class Gate(object):
 		self.input_vals =  np.zeros(inputs*input_dimensions)
 
 	def set_input(self, t, x):
-		#print(x)
 		self.input_vals = x
-		#print("set_input")
 
 	def set_gate(self, t, x):
-		#print(x)
 		self.gate_vals = x
-		#print("gate_vals")
 
 	def output(self, t):
 		# write anything with a gate value smaller than zero to zero
