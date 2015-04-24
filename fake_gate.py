@@ -5,8 +5,8 @@ import ipdb
 
 class Gate(object):
 	def __init__(self, inputs, input_dimensions):
-		print(inputs)
-		print(input_dimensions)
+		#print(inputs)
+		#print(input_dimensions)
 
 		self.input_dimensions = input_dimensions
 		self.inputs = inputs

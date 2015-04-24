@@ -1,6 +1,7 @@
 import nengo
 import ipdb
 import fake_gate
+import matplotlib.pyplot as plt
 import numpy as np
 from nengo.utils.functions import piecewise
 
@@ -45,9 +46,9 @@ with model:
 sim = nengo.Simulator(model)
 sim.run(0.6)
 
-#fig = plt.figure()
-#plt.plot(sim.trange(), sim.data[out_probe])
+fig = plt.figure()
+plt.plot(sim.trange(), sim.data[out_probe])
 
-#plt.show()
+plt.show()
 
 #ipdb.set_trace()
