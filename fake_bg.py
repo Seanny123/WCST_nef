@@ -21,6 +21,7 @@ class FakeBG(object):
 		# if the reward drops from the threshold, change the state
 		if(self.reward > self.threshold):
 			self.crossed = True
+			print("CROSSED")
 		elif(self.reward < self.threshold and self.crossed == True):
 			self.crossed = False
 			self.reward = 0
@@ -36,9 +37,9 @@ class FakeBG(object):
 
 def make_bg(dimensions, threshold):
 	with nengo.Network(label="fake basal_ganglia") as bg:
-		bg = FakeBG(dimensions, threshold)
-		bg.reward_input = nengo.Node(bg.reward_input, size_in=1)
-		bg.gate_output = nengo.Node(bg.reward_input, size_out=dimensions)
+		fake_bg = FakeBG(dimensions, threshold)
+		bg.reward_input = nengo.Node(fake_bg.reward_input, size_in=1)
+		bg.gate_output = nengo.Node(fake_bg.gate_output, size_out=dimensions)
 	return bg
 
 

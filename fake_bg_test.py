@@ -28,12 +28,12 @@ dt = 0.01
 with model:
 	reward_input  = nengo.Node(piecewise({
 			0:0,
-			1:2*dt,
-			2:-4*dt,
-			3:0,
-			4:2*dt,
-			5:-4*dt,
-			6:0
+			1.5:2*dt,
+			2.5:-4*dt,
+			3.5:0,
+			4.5:2*dt,
+			5.5:-4*dt,
+			6.5:0
 		}))
 
 	fg = fake_bg.make_bg(3, 1)
@@ -41,10 +41,15 @@ with model:
 	nengo.Connection(reward_input, fg.reward_input)
 
 	gate_probe = nengo.Probe(fg.gate_output)
+	# it seems to be working properly, but maybe also plot the accumulated reward?
 
-sim = nengo.Simulator()
+sim = nengo.Simulator(model, dt=dt)
 sim.run(6)
 
 fig = plt.figure()
-plt.plot(sim.trange(), sim.data[gate_probe])
+plt.plot(sim.trange(), sim.data[crossed_probe]*0.5, label="crossed")
+plt.plot(sim.trange(), sim.data[reward_probe], label="reward")
+plt.plot(sim.trange(), sim.data[gate_probe], label="gate")
+plt.ylim(0,2)
+plt.legend()
 plt.show()
