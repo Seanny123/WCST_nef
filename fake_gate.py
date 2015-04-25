@@ -1,6 +1,11 @@
 import nengo
 import numpy as np
 
+import sys
+from IPython.core import ultratb
+sys.excepthook = ultratb.FormattedTB(mode='Verbose',
+     color_scheme='Linux', call_pdb=1)
+
 import ipdb
 
 class Gate(object):
@@ -28,8 +33,10 @@ class Gate(object):
 			return np.zeros(self.input_dimensions)
 		elif(out_dim > self.input_dimensions):
 			out_dim = self.input_dimensions
-			self.input_vals.reshape((self.inputs, self.input_dimensions))[np.where(self.gate_vals>0)[0][0]].reshape(out_dim*self.input_dimensions)
+			return self.input_vals.reshape((self.inputs, self.input_dimensions))[np.where(self.gate_vals>0)[0][0]].reshape(out_dim*self.input_dimensions)
 		else:
+			#if(t > 0.8):
+			#	ipdb.set_trace()
 			return self.input_vals.reshape((self.inputs, self.input_dimensions))[self.gate_vals>0].reshape(out_dim*self.input_dimensions)
 
 
