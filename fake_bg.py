@@ -1,4 +1,5 @@
 import numpy as np
+import nengo
 
 # basically forward the signal that matters
 class FakeBG(object):
@@ -27,6 +28,8 @@ class FakeBG(object):
 			self.state = np.zeros(self.dimensions)
 			self.state_index = (self.state_index + 1) % self.dimensions
 			self.state[self.state_index] = 1
+		elif(self.reward < 0):
+			self.reward = 0
 
 	def gate_output(self, t):
 		return self.state
@@ -34,8 +37,8 @@ class FakeBG(object):
 def make_bg(dimensions, threshold):
 	with nengo.Network(label="fake basal_ganglia") as bg:
 		bg = FakeBG(dimensions, threshold)
-		bg.reward_input = nengo.Node(reward_input, size_in=1)
-		bg.gate_output = nengo.Node(reward_input, size_out=dimensions)
+		bg.reward_input = nengo.Node(bg.reward_input, size_in=1)
+		bg.gate_output = nengo.Node(bg.reward_input, size_out=dimensions)
 	return bg
 
 

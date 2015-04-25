@@ -21,3 +21,30 @@ for _ in range(2):
 assert(fg.state_index == 0)
 ipdb.set_trace()
 """
+
+model = nengo.Network()
+dt = 0.01
+
+with model:
+	reward_input  = nengo.Node(piecewise({
+			0:0,
+			1:2*dt,
+			2:-4*dt,
+			3:0,
+			4:2*dt,
+			5:-4*dt,
+			6:0
+		}))
+
+	fg = fake_bg.make_bg(3, 1)
+
+	nengo.Connection(reward_input, fg.reward_input)
+
+	gate_probe = nengo.Probe(fg.gate_output)
+
+sim = nengo.Simulator()
+sim.run(6)
+
+fig = plt.figure()
+plt.plot(sim.trange(), sim.data[gate_probe])
+plt.show()
