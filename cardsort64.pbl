@@ -336,6 +336,10 @@ PlayForeground(feedbacksound)
                    ## only do so after the first category
 				   if(numCats >0)
                    {
+                    # Sean:
+                    # I understand this is keeping track of the perservative runs
+                    # But this is in a really weird place
+                    # Also, it never seems to be used again....
 					persRun <- Append(persRun, persev)
                    }
                 }

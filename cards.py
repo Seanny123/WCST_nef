@@ -12,8 +12,16 @@ class Card(object):
 	def __repr__(self):
 		return "Card:%s,%s,%s" %(self.shape, self.colour, self.number)
 
+	def get_spa(self):
+		return "%s*SHAPE+%s*COLOUR+%s*NUMBER" %(self.shape, self.colour, self.number)
+
 class WCST(object):
-	def __init__(self):
+	def __init__(self, vocab, output_file="results.txt"):
+
+		# get SPA setup
+		self.vocab = vocab
+
+		# initialize card related things
 		colours = ["GREEN", "RED", "YELLOW", "BLUE"]
 		numbers = ["ONE", "TWO", "THREE", "FOUR"]
 		shapes = ["STAR", "CIRCLE", "TRIANGLE", "PLUS"]
@@ -29,16 +37,22 @@ class WCST(object):
 					break
 				else:
 					deck.append(Card(*card))
-
 		# get the trial card
 		self.trial = deck.pop
+		# Note that another option is to remove cards sharing  2+
+		# attributes with stimulus cards
+		# See Nelson HE: A modified card sorting test sensitive to 
+		#        frontal lobe defects. Cortex 1976;12:313-324.
+
 		# initialize settings
 		self.rule_list = ["colour", "shape", "number"]
 		self.last_rule = ""
 		self.rule = ""
 		self.run_num = 0
 		self.run_length = 10
+		self.output_file = output_file
 
+		# initialize stat tracking
 		# Correct responses
 		self.tot_corr = 0
 		# Perseverative responses
@@ -56,15 +70,19 @@ class WCST(object):
 		self.trial_pers_err = 0
 		self.persev = 0
 
-	def get_displayed(self):
-		"""get the currently displayed cards, not actually used since the similarity network has them hard-coded at the moment"""
+	def get_displayed(self, t):
+		"""get the currently displayed cards
+		not actually used since the similarity network 
+		has them hard-coded at the moment
+
+		Note: this should technically return a semantic pointer"""
 		return self.displayed
 
-	def get_trial(self):
+	def get_trial(self, t):
 		"""get the currently focused trial card"""
-		return self.trial
+		return self.vocab.parse(self.trial.get_spa())
 
-	def match(self, trial, selected):
+	def match(self, t, trial, selected):
 		"""score the match"""
 		feedback = False
 		# if matched
@@ -72,7 +90,12 @@ class WCST(object):
 			feedback = True
 		else:
 			# if it doesn't match any of the rules
-			self.unique_err += 1
+			rule_match = False
+			for rule in rule_list:
+				if(getattr(trial, rule) == getattr(selected, rule)):
+					rule_match = True
+			if(rule_match == False):
+				self.unique_err += 1
 
 		# if the last rule was also matched
 		if(self.last_rule != ""):
@@ -98,7 +121,8 @@ class WCST(object):
 		if(cat_num >= 9):
 			# why would this go over?
 			self.cat_num = 9
-			return "Done"
+			# if we return anything other than a boolean, things might explode
+			return True
 
 		# get a new trial card
 		self.trial = self.deck.pop
@@ -106,3 +130,32 @@ class WCST(object):
 
 	def write_result(self):
 		print("result")
+		self.output_file.write("Subnum trial run rule lastrule color shape number resp corr last_corr corr_col corr_shape corr_num persev persev_err abstime rt\n")
+
+class FeedbackNode(object):
+	# how much reward should I give and for how long?
+	# I guess it doesn't matter since the basal ganglia set the threshold anyways
+	# but it just feels kind of weird to give long continuous error
+	# so we're going to time limit it
+	# so that regardless of reaction time (which will be included later)
+	# the same amount of reward will be given
+
+	def __init__(self, feedback_timelimit =0.3, neg_reward=-0.1, pos_reward=0.1):
+		self.timer = 0.0
+		self.timelimit = timelimit
+		self.neg_reward = neg_reward
+		self.pos_reward = pos_reward
+
+
+
+	def feedback_func(self, t, feedback):
+		if(self.timer < self.timelimit)
+			if(feedback):
+				return self.pos_reward
+			else:
+				return self.neg_reward
+
+
+
+def card_net():
+	with nengo.Network(label="Card simulator") as card_sim:

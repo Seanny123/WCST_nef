@@ -42,9 +42,4 @@ def make_bg(dimensions, threshold):
 		bg.gate_output = nengo.Node(fake_bg.gate_output, size_out=dimensions)
 	return bg
 
-
-# Train the current transform if it's right
-# Otherwise, discard it
-# When the reward dies after multiple successes, switch rules
-
 # I really feel like I need a mechanism to learn from failures, but I can't figure out how. I guess I have to run the model and find out the hard way.

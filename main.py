@@ -10,19 +10,14 @@ vocab = nengo.spa.Vocabulary(WCST_dimensions)
 # then see how long it takes for it to find that first rule
 # the dangers of putting our faith in randomness
 
-model = spa.SPA(label="Simple question answering")
+# Simulate for x steps until the card task is finished
+
+wsct = WCST("pants")
+
+model = nengo.Network(label="WCST")
 
 with model:
-	model.colour_in = spa.Buffer(dimensions=WCST_dimensions)
-	model.shape_in = spa.Buffer(dimensions=WCST_dimensions)
-	model.number_in = spa.Buffer(dimensions=WCST_dimensions)
 
-	# I think I want this to be a memory...
-	model.transform = spa.
-
-	# connect the buffers... Somehow...
-	cortical_actions = spa.Actions(
-
-	)
-
-# So, hypothetically, I could do the flow control (trial, compute transform, another trial, compute another transform) with the basal ganglia, but I can also just do it with code, right?
+sim = nengo.Simulator(model)
+while(wcst.cat_num >= 9):
+	sim.step()
