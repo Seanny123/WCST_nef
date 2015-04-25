@@ -50,5 +50,3 @@ plt.plot(sim.trange(), sim.data[out_probe], label="output")
 plt.ylim(-1.25,1.25)
 plt.show()
 plt.legend()
-
-#ipdb.set_trace()
