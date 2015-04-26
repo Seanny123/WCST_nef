@@ -16,11 +16,13 @@ class Card(object):
 		return "%s*SHAPE+%s*COLOUR+%s*NUMBER" %(self.shape, self.colour, self.number)
 
 class WCST(object):
+	"""note the test ends either two decks of 64 cards have been sorted or six categories have been achieved"""
 	def __init__(self, vocab, card_step_size=0.5, output_file="results.txt"):
 
 		# network specific stuff
 		self.vocab = vocab
 		self.card_step_size = card_step_size
+		self.out_of_cards = False
 
 		# initialize card related things
 		colours = ["GREEN", "RED", "YELLOW", "BLUE"]
@@ -32,12 +34,16 @@ class WCST(object):
 		deck = []
 		for card in itertools.product(numbers, shapes, colours):
 			# get the displayed cards
+			found = False
 			for d in self.disp:
 				if(card == d):
 					self.displayed.append(card)
+					found = True
 					break
-				else:
-					deck.append(Card(*card))
+			if(found == False):
+				deck.append(Card(*card))
+		# in the official task, a deck of 128 cards is used
+		# here we will use 64 cards and extrapolate from there
 		# get the trial card
 		self.trial = deck.pop
 		# Note that another option is to remove cards sharing  2+
@@ -87,8 +93,11 @@ class WCST(object):
 
 	def match(self, t, selected_vec):
 		"""score the match, this is the method that synchronizes the whole network artificially
+
+			there's a ton of different scores that you can get here, but the 
+			perservative errors and categories are most important for me
 		"""
-		if(t % self.card_step_size == 0.0):
+		if(t % self.card_step_size == 0.0 and self.out_of_cards = False):
 			trial = self.trial
 			selected = Card(self.disp[argmax(selected_vec)]*)
 			self.feedback = False
@@ -116,25 +125,21 @@ class WCST(object):
 
 			if(self.run_num >= self.run_length):
 				self.last_rule = self.rule
-				#self.rule = #HOW TO GENERATE RULE?
+				self.cat_num += 1
+				self.rule = self.rule_list[self.cat_num % 3]
 				self.run_num = 0
-				self.cat_num +=1
+
 
 				# I DO NOT UNDERSTAND THE PERSEVERATIVE FLAG THING
 
 				if(cat_num == 1):
 					first_cat = self.trial_num
 
-			if(cat_num >= 9):
-				# why would this go over?
-				self.cat_num = 9
-
-			# get a new trial card
-			self.trial = self.deck.pop
-
-	def write_result(self):
-		print("result")
-		self.output_file.write("Subnum trial run rule lastrule color shape number resp corr last_corr corr_col corr_shape corr_num persev persev_err abstime rt\n")
+			if(len(self.deck) != 0):
+				# get a new trial card
+				self.trial = self.deck.pop
+			else:
+				self.out_of_cards = True
 
 class FeedbackNode(object):
 	# how much reward should I give and for how long?
