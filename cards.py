@@ -27,12 +27,12 @@ class WCST(object):
 		numbers = ["ONE", "TWO", "THREE", "FOUR"]
 		shapes = ["STAR", "CIRCLE", "TRIANGLE", "PLUS"]
 		# create a deck full of cards
-		disp = [("ONE","TRIANGLE","RED"), ("TWO","STAR","GREEN"), ("THREE","PLUS","YELLOW"), ("FOUR","CIRCLE","BLUE")]
+		self.disp = [("ONE","TRIANGLE","RED"), ("TWO","STAR","GREEN"), ("THREE","PLUS","YELLOW"), ("FOUR","CIRCLE","BLUE")]
 		self.displayed = []
 		deck = []
 		for card in itertools.product(numbers, shapes, colours):
 			# get the displayed cards
-			for d in disp:
+			for d in self.disp:
 				if(card == d):
 					self.displayed.append(card)
 					break
@@ -85,10 +85,12 @@ class WCST(object):
 		"""get the currently focused trial card"""
 		return self.vocab.parse(self.trial.get_spa())
 
-	def match(self, t, trial, selected):
-		"""score the match
+	def match(self, t, selected_vec):
+		"""score the match, this is the method that synchronizes the whole network artificially
 		"""
 		if(t % self.card_step_size == 0.0):
+			trial = self.trial
+			selected = Card(self.disp[argmax(selected_vec)]*)
 			self.feedback = False
 			# if matched
 			if(getattr(trial, self.rule) == getattr(selected, self.rule)):
@@ -166,12 +168,6 @@ def card_net(vocab):
 		feed = FeedbackNode()
 		card_runner = WCST(vocab)
 
-		# SOOOOO.... WE NEED TO TRANSLATE THIS FROM SPA
-		# TODO: MAKE INPUT MAKE SENSE
-		# IS THE ONLY WAY TO DO THIS WITH INVERSE CONVOLUTION
-		# I SWEAR THERE'S GOTTA BE A BETTER WAY
-		# DUURRRR. THE TRIAL CARD IS SAVED.
-		# WE CAN GET THE SELECTED FROM THE SIMILARITY NETWORK
 		card_sim.input = nengo.Node(card_runner.match)
 		card_sim.trial_card = nengo.Node(card_runner.get_trial)
 		card_sim.feedback = nengo.Node(feedback_out, size_out=1)
