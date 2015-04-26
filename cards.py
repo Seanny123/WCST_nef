@@ -16,10 +16,11 @@ class Card(object):
 		return "%s*SHAPE+%s*COLOUR+%s*NUMBER" %(self.shape, self.colour, self.number)
 
 class WCST(object):
-	def __init__(self, vocab, output_file="results.txt"):
+	def __init__(self, vocab, card_step_size=0.5, output_file="results.txt"):
 
-		# get SPA setup
+		# network specific stuff
 		self.vocab = vocab
+		self.card_step_size = card_step_size
 
 		# initialize card related things
 		colours = ["GREEN", "RED", "YELLOW", "BLUE"]
@@ -70,6 +71,8 @@ class WCST(object):
 		self.trial_pers_err = 0
 		self.persev = 0
 
+		self.feedback = False
+
 	def get_displayed(self, t):
 		"""get the currently displayed cards
 		not actually used since the similarity network 
@@ -83,50 +86,49 @@ class WCST(object):
 		return self.vocab.parse(self.trial.get_spa())
 
 	def match(self, t, trial, selected):
-		"""score the match"""
-		feedback = False
-		# if matched
-		if(getattr(trial, self.rule) == getattr(selected, self.rule)):
-			feedback = True
-		else:
-			# if it doesn't match any of the rules
-			rule_match = False
-			for rule in rule_list:
-				if(getattr(trial, rule) == getattr(selected, rule)):
-					rule_match = True
-			if(rule_match == False):
-				self.unique_err += 1
+		"""score the match
+		"""
+		if(t % self.card_step_size == 0.0):
+			self.feedback = False
+			# if matched
+			if(getattr(trial, self.rule) == getattr(selected, self.rule)):
+				self.feedback = True
+			else:
+				# if it doesn't match any of the rules
+				rule_match = False
+				for rule in rule_list:
+					if(getattr(trial, rule) == getattr(selected, rule)):
+						rule_match = True
+				if(rule_match == False):
+					self.unique_err += 1
 
-		# if the last rule was also matched
-		if(self.last_rule != ""):
-			if(getattr(trial, self.last_rule) == getattr(selected, self.last_rule)):
-				self.tot_pers += 1
-				self.persev += 1
-			if(~feedback):
-				self.tot_pers_err += 1
-				self.trial_pers_err += 1
+			# if the last rule was also matched
+			if(self.last_rule != ""):
+				if(getattr(trial, self.last_rule) == getattr(selected, self.last_rule)):
+					self.tot_pers += 1
+					self.persev += 1
+				if(~self.feedback):
+					self.tot_pers_err += 1
+					self.trial_pers_err += 1
 
 
-		if(self.run_num >= self.run_length):
-			self.last_rule = self.rule
-			#self.rule = #HOW TO GENERATE RULE?
-			self.run_num = 0
-			self.cat_num +=1
+			if(self.run_num >= self.run_length):
+				self.last_rule = self.rule
+				#self.rule = #HOW TO GENERATE RULE?
+				self.run_num = 0
+				self.cat_num +=1
 
-			# I DO NOT UNDERSTAND THE PERSEVERATIVE FLAG THING
+				# I DO NOT UNDERSTAND THE PERSEVERATIVE FLAG THING
 
-			if(cat_num == 1):
-				first_cat = self.trial_num
+				if(cat_num == 1):
+					first_cat = self.trial_num
 
-		if(cat_num >= 9):
-			# why would this go over?
-			self.cat_num = 9
-			# if we return anything other than a boolean, things might explode
-			return True
+			if(cat_num >= 9):
+				# why would this go over?
+				self.cat_num = 9
 
-		# get a new trial card
-		self.trial = self.deck.pop
-		return feedback
+			# get a new trial card
+			self.trial = self.deck.pop
 
 	def write_result(self):
 		print("result")
@@ -145,17 +147,34 @@ class FeedbackNode(object):
 		self.timelimit = timelimit
 		self.neg_reward = neg_reward
 		self.pos_reward = pos_reward
+		self.feedback = 0.0
 
+	def set_feeback(self, feedback):
+		self.feedback = feedback
 
-
-	def feedback_func(self, t, feedback):
-		if(self.timer < self.timelimit)
-			if(feedback):
+	def feedback_out(self, t):
+		if(self.feedback = 0.0):
+			return self.feedback
+		elif(self.timer < self.timelimit):
+			if(self.feedback):
 				return self.pos_reward
 			else:
 				return self.neg_reward
 
-
-
-def card_net():
+def card_net(vocab):
 	with nengo.Network(label="Card simulator") as card_sim:
+		feed = FeedbackNode()
+		card_runner = WCST(vocab)
+
+		# SOOOOO.... WE NEED TO TRANSLATE THIS FROM SPA
+		# TODO: MAKE INPUT MAKE SENSE
+		# IS THE ONLY WAY TO DO THIS WITH INVERSE CONVOLUTION
+		# I SWEAR THERE'S GOTTA BE A BETTER WAY
+		# DUURRRR. THE TRIAL CARD IS SAVED.
+		# WE CAN GET THE SELECTED FROM THE SIMILARITY NETWORK
+		card_sim.input = nengo.Node(card_runner.match)
+		card_sim.trial_card = nengo.Node(card_runner.get_trial)
+		card_sim.feedback = nengo.Node(feedback_out, size_out=1)
+
+		nengo.Connection(card_runner.feedback, feed.set_feeback)
+	return card_sim
