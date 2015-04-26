@@ -23,3 +23,6 @@ while(wcst.cat_num >= 6 and wcst.out_of_cards == False):
 	sim.step()
 
 # write out the results
+output_file = open("results.txt", "w")
+output_file.write("pers_err:%s" %(float(wcst.total_pers_error)/float(wcst.run_num)*100))
+output_file.write("categories:%s" %wcst.cat_num)

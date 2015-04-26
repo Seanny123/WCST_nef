@@ -17,7 +17,7 @@ class Card(object):
 
 class WCST(object):
 	"""note the test ends either two decks of 64 cards have been sorted or six categories have been achieved"""
-	def __init__(self, vocab, card_step_size=0.5, output_file="results.txt"):
+	def __init__(self, vocab, card_step_size=0.5):
 
 		# network specific stuff
 		self.vocab = vocab
@@ -57,7 +57,6 @@ class WCST(object):
 		self.rule = ""
 		self.run_num = 0
 		self.run_length = 10
-		self.output_file = output_file
 
 		# initialize stat tracking
 		# Correct responses
@@ -74,8 +73,13 @@ class WCST(object):
 		# Trials to figure first category
 		self.first_cat
 
+		# just a flag for keeping track if a perservative error was made
 		self.trial_pers_err = 0
+		self.trial_persev = 0
+		# this list of persevative responses, will be ignored for now
 		self.persev = 0
+		self.pers_run_list = []
+		self.pers_run_flag = True
 
 		self.feedback = False
 
@@ -101,6 +105,7 @@ class WCST(object):
 			trial = self.trial
 			selected = Card(self.disp[argmax(selected_vec)]*)
 			self.feedback = False
+
 			# if matched
 			if(getattr(trial, self.rule) == getattr(selected, self.rule)):
 				self.feedback = True
@@ -113,14 +118,18 @@ class WCST(object):
 				if(rule_match == False):
 					self.unique_err += 1
 
-			# if the last rule was also matched
+			# if the last rule was matched
 			if(self.last_rule != ""):
 				if(getattr(trial, self.last_rule) == getattr(selected, self.last_rule)):
+					# keep track of perservative responses
 					self.tot_pers += 1
 					self.persev += 1
+					self.trial_pers_err = 0
+					self.trial_persev = 1
 				if(~self.feedback):
+					# keep track of preservative errors
 					self.tot_pers_err += 1
-					self.trial_pers_err += 1
+					self.trial_pers_err = 1
 
 
 			if(self.run_num >= self.run_length):
@@ -131,6 +140,7 @@ class WCST(object):
 
 
 				# I DO NOT UNDERSTAND THE PERSEVERATIVE FLAG THING
+				# I will ignore it for now
 
 				if(cat_num == 1):
 					first_cat = self.trial_num
