@@ -1,9 +1,6 @@
 import nengo
 from nengo.dists import Uniform
 
-# hook it up to see if it's calculating the transform properly
-# then use the transform to caclulate rules and get actions out (maybe do with a fake basal ganglia)
-
 def ea_integrator(n_neurons, dimensions, input_scale=1.0, forget_rate=0.0, step_size=1.0):
 	tau_PSC = 0.007
 	int_PSC = 0.1

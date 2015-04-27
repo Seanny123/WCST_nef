@@ -32,6 +32,13 @@ class FakeBG(object):
 		elif(self.reward < 0):
 			self.reward = 0
 
+	def mem_gate(self, t):
+		"""only train the memories while receiving reward"""
+		if(self.reward != 0):
+			return self.state
+		else:
+			return np.zeros(self.dimensions)
+
 	def gate_output(self, t):
 		return self.state
 
@@ -40,6 +47,7 @@ def make_bg(dimensions, threshold):
 		fake_bg = FakeBG(dimensions, threshold)
 		bg.reward_input = nengo.Node(fake_bg.reward_input, size_in=1)
 		bg.gate_output = nengo.Node(fake_bg.gate_output, size_out=dimensions)
+		bg.mem_gate = nengo.Node(fake_bg.mem_gate, size_out=dimensions)
 	return bg
 
 # I really feel like I need a mechanism to learn from failures, but I can't figure out how. I guess I have to run the model and find out the hard way.
