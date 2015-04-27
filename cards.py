@@ -103,7 +103,10 @@ class WCST(object):
 
 	def get_trial(self, t):
 		"""get the currently focused trial card"""
-		return self.vocab.parse(self.trial.get_spa())
+		return self.vocab.parse(self.trial.get_spa()).v
+
+	def cc_res(self, t):
+		return self.vocab.parse("self.trial.get_spa()*~(self.selected.get_spa())").v
 
 	def match(self, t, selected_vec):
 		"""score the match, this is the method that synchronizes the whole network artificially
