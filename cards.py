@@ -1,7 +1,10 @@
 import itertools
+import nengo
+import nengo.spa
+import numpy as np
 
 class Card(object):
-	def __init__(self, shape, colour, number):
+	def __init__(self, number, shape, colour):
 		self.shape = shape
 		self.colour = colour
 		self.number = number
@@ -29,9 +32,14 @@ class WCST(object):
 		numbers = ["ONE", "TWO", "THREE", "FOUR"]
 		shapes = ["STAR", "CIRCLE", "TRIANGLE", "PLUS"]
 		# create a deck full of cards
-		self.disp = [("ONE","TRIANGLE","RED"), ("TWO","STAR","GREEN"), ("THREE","PLUS","YELLOW"), ("FOUR","CIRCLE","BLUE")]
+		self.disp = [
+			("ONE","TRIANGLE","RED"),
+			("TWO","STAR","GREEN"),
+			("THREE","PLUS","YELLOW"),
+			("FOUR","CIRCLE","BLUE")
+		]
 		self.displayed = []
-		deck = []
+		self.deck = []
 		for card in itertools.product(numbers, shapes, colours):
 			# get the displayed cards
 			found = False
@@ -41,11 +49,11 @@ class WCST(object):
 					found = True
 					break
 			if(found == False):
-				deck.append(Card(*card))
+				self.deck.append(Card(*card))
 		# in the official task, a deck of 128 cards is used
 		# here we will use 64 cards and extrapolate from there
 		# get the trial card
-		self.trial = deck.pop
+		self.trial = self.deck.pop()
 		# Note that another option is to remove cards sharing  2+
 		# attributes with stimulus cards
 		# See Nelson HE: A modified card sorting test sensitive to 
@@ -53,8 +61,8 @@ class WCST(object):
 
 		# initialize settings
 		self.rule_list = ["colour", "shape", "number"]
+		self.rule = self.rule_list[0]
 		self.last_rule = ""
-		self.rule = ""
 		self.run_num = 0
 		self.run_length = 10
 
@@ -71,7 +79,7 @@ class WCST(object):
 		# Number of categories
 		self.cat_num = 0
 		# Trials to figure first category
-		self.first_cat
+		self.first_cat = 0
 
 		# just a flag for keeping track if a perservative error was made
 		self.trial_pers_err = 0
@@ -101,18 +109,20 @@ class WCST(object):
 			there's a ton of different scores that you can get here, but the 
 			perservative errors and categories are most important for me
 		"""
-		if(t % self.card_step_size == 0.0 and self.out_of_cards = False):
+		if(t % self.card_step_size == 0.0 and not(self.out_of_cards)):
 			trial = self.trial
-			selected = Card(self.disp[argmax(selected_vec)]*)
+			selected = Card(*self.disp[np.argmax(selected_vec)])
 			self.feedback = False
 
 			# if matched
 			if(getattr(trial, self.rule) == getattr(selected, self.rule)):
 				self.feedback = True
+				self.tot_corr += 1
+				self.run_num += 1
 			else:
 				# if it doesn't match any of the rules
 				rule_match = False
-				for rule in rule_list:
+				for rule in self.rule_list:
 					if(getattr(trial, rule) == getattr(selected, rule)):
 						rule_match = True
 				if(rule_match == False):
@@ -126,11 +136,10 @@ class WCST(object):
 					self.persev += 1
 					self.trial_pers_err = 0
 					self.trial_persev = 1
-				if(~self.feedback):
+				if(not(self.feedback)):
 					# keep track of preservative errors
 					self.tot_pers_err += 1
 					self.trial_pers_err = 1
-
 
 			if(self.run_num >= self.run_length):
 				self.last_rule = self.rule
@@ -142,12 +151,12 @@ class WCST(object):
 				# I DO NOT UNDERSTAND THE PERSEVERATIVE FLAG THING
 				# I will ignore it for now
 
-				if(cat_num == 1):
-					first_cat = self.trial_num
+				if(self.cat_num == 1):
+					self.first_cat = self.trial_num
 
 			if(len(self.deck) != 0):
 				# get a new trial card
-				self.trial = self.deck.pop
+				self.trial = self.deck.pop()
 			else:
 				self.out_of_cards = True
 
@@ -159,7 +168,7 @@ class FeedbackNode(object):
 	# so that regardless of reaction time (which will be included later)
 	# the same amount of reward will be given
 
-	def __init__(self, feedback_timelimit =0.3, neg_reward=-0.1, pos_reward=0.1):
+	def __init__(self, feedback_timelimit=0.3, neg_reward=-0.1, pos_reward=0.1):
 		self.timer = 0.0
 		self.timelimit = timelimit
 		self.neg_reward = neg_reward
@@ -170,7 +179,7 @@ class FeedbackNode(object):
 		self.feedback = feedback
 
 	def feedback_out(self, t):
-		if(self.feedback = 0.0):
+		if(self.feedback == 0.0):
 			return self.feedback
 		elif(self.timer < self.timelimit):
 			if(self.feedback):
