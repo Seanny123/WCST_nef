@@ -170,7 +170,7 @@ class FeedbackNode(object):
 	# so that regardless of reaction time (which will be included later)
 	# the same amount of reward will be given
 
-	def __init__(self, feedback_timelimit=0.3, neg_reward=-0.1, pos_reward=0.1):
+	def __init__(self, timelimit=0.3, neg_reward=-0.1, pos_reward=0.1):
 		self.timer = 0.0
 		self.timelimit = timelimit
 		self.neg_reward = neg_reward
