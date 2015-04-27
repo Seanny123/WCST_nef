@@ -64,7 +64,9 @@ class WCST(object):
 		self.rule = self.rule_list[0]
 		self.last_rule = ""
 		self.run_num = 0
-		self.run_length = 10
+		# in the official task it's 10, but apparently 5 works pretty great
+		# http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0063885
+		self.run_length = 5
 
 		# initialize stat tracking
 		# Correct responses

@@ -18,7 +18,9 @@ vocab.add("TWO", vocab.parse("ONE*ONE"))
 vocab.add("THREE", vocab.parse("ONE*TWO"))
 vocab.add("FOUR", vocab.parse("ONE*THREE"))
 
+# these unit test should really be decoupled... oops
 wcst = cards.WCST(vocab)
+wcst.run_length = 10
 # get first wrong
 wcst.trial = cards.Card("TWO", "TRIANGLE","BLUE")
 wcst.match(0.5, [1,0,0,0])
@@ -47,7 +49,18 @@ for i in range(10):
 	wcst.trial = cards.Card("TWO", "TRIANGLE","BLUE")
 	wcst.match(0.5, [0,1,0,0])
 assert(wcst.tot_pers_err == 1)
-# test category completion termination condition
-# test deck exhaustion termination condition
+assert(wcst.cat_num == 3)
 
-#ipdb.set_trace()
+# test category completion termination condition
+wcst = cards.WCST(vocab)
+for i in range(9):
+	wcst.trial = cards.Card("TWO", "TRIANGLE","BLUE")
+	wcst.match(0.5, [1,0,0,0])
+
+# test deck exhaustion termination condition
+wcst = cards.WCST(vocab)
+wcst.deck = []
+wcst.match(0.5, [1,0,0,0])
+assert(wcst.out_of_cards == True)
+
+# test reward timing with a network
