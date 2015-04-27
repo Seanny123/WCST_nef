@@ -2,6 +2,7 @@ import cards
 import itertools
 import nengo
 import nengo.spa
+from nengo.utils.functions import piecewise
 import ipdb
 
 #import sys
@@ -66,8 +67,27 @@ assert(wcst.out_of_cards == True)
 """
 
 # test reward timing with a network
-
+# also tests node functionality
 model = nengo.Network(label="reward test")
 
 with model:
-	cn = cards.card_net
+	selected_input = nengo.Node(piecewise({0:[1,0,0,0], 0.6:[0,0,0,1]}))
+
+	cn = cards.card_net(vocab)
+	cn.card_runner.deck = [cards.Card("TWO", "TRIANGLE","BLUE")] * 5
+	cn.card_runner.trial = cards.Card("TWO", "TRIANGLE","BLUE")
+
+	nengo.Connection(selected_input, cn.input)
+
+	reward_probe = nengo.Probe(cn.feedback)
+	feed_probe = nengo.Probe(cn.feedback_input)
+
+sim = nengo.Simulator(model)
+sim.run(2.0)
+
+import matplotlib.pyplot as plt
+
+fig = plt.figure()
+plt.plot(sim.trange(), sim.data[reward_probe])
+#plt.plot(sim.trange(), sim.data[feed_probe])
+plt.show()

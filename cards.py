@@ -54,6 +54,8 @@ class WCST(object):
 		# here we will use 64 cards and extrapolate from there
 		# get the trial card
 		self.trial = self.deck.pop()
+		#initialize it with a silly value
+		self.selected =  self.trial
 		# Note that another option is to remove cards sharing  2+
 		# attributes with stimulus cards
 		# See Nelson HE: A modified card sorting test sensitive to 
@@ -106,21 +108,25 @@ class WCST(object):
 		return self.vocab.parse(self.trial.get_spa()).v
 
 	def cc_res(self, t):
-		return self.vocab.parse("self.trial.get_spa()*~(self.selected.get_spa())").v
+		return self.vocab.parse(  "%s*~(%s)" %( self.trial.get_spa(),self.selected.get_spa() )  ).v
 
 	def match(self, t, selected_vec):
 		"""score the match, this is the method that synchronizes the whole network artificially
 
 			there's a ton of different scores that you can get here, but the 
 			perservative errors and categories are most important for me
+
+			I adapted this from the PEBL scoring method in cardsort64.pbl
 		"""
 		if(t % self.card_step_size == 0.0 and not(self.out_of_cards)):
-			trial = self.trial
-			selected = Card(*self.disp[np.argmax(selected_vec)])
+			self.selected = Card(*self.disp[np.argmax(selected_vec)])
 			self.feedback = False
+			print(self.trial)
+			print(self.selected)
 
 			# if matched
-			if(getattr(trial, self.rule) == getattr(selected, self.rule)):
+			if(getattr(self.trial, self.rule) == getattr(self.selected, self.rule)):
+				print("MATCHED!")
 				self.feedback = True
 				self.tot_corr += 1
 				self.run_num += 1
@@ -128,14 +134,14 @@ class WCST(object):
 				# if it doesn't match any of the rules
 				rule_match = False
 				for rule in self.rule_list:
-					if(getattr(trial, rule) == getattr(selected, rule)):
+					if(getattr(self.trial, rule) == getattr(self.selected, rule)):
 						rule_match = True
 				if(rule_match == False):
 					self.unique_err += 1
 
 			# if the last rule was matched
 			if(self.last_rule != ""):
-				if(getattr(trial, self.last_rule) == getattr(selected, self.last_rule)):
+				if(getattr(self.trial, self.last_rule) == getattr(self.selected, self.last_rule)):
 					# keep track of perservative responses
 					self.tot_pers += 1
 					self.persev += 1
@@ -173,33 +179,40 @@ class FeedbackNode(object):
 	# so that regardless of reaction time (which will be included later)
 	# the same amount of reward will be given
 
-	def __init__(self, timelimit=0.3, neg_reward=-0.1, pos_reward=0.1):
-		self.timer = 0.0
+	def __init__(self, timelimit=0.3, neg_reward=-0.1, pos_reward=0.1,  card_step_size=0.5):
+		self.card_step_size = card_step_size
 		self.timelimit = timelimit
 		self.neg_reward = neg_reward
 		self.pos_reward = pos_reward
-		self.feedback = 0.0
+		self.feedback = -1
 
-	def set_feeback(self, feedback):
+	def set_feeback(self, t, feedback):
 		self.feedback = feedback
 
 	def feedback_out(self, t):
-		if(self.feedback == 0.0):
-			return self.feedback
-		elif(self.timer < self.timelimit):
+		if(self.feedback == -1):
+			return 0.0
+		elif(t%self.card_step_size < self.timelimit):
 			if(self.feedback):
 				return self.pos_reward
 			else:
 				return self.neg_reward
+		else:
+				return 0.0
 
 def card_net(vocab):
 	with nengo.Network(label="Card simulator") as card_sim:
 		feed = FeedbackNode()
-		card_runner = WCST(vocab)
+		# only accessible for testing purposes
+		card_sim.card_runner = WCST(vocab)
 
-		card_sim.input = nengo.Node(card_runner.match)
-		card_sim.trial_card = nengo.Node(card_runner.get_trial)
-		card_sim.feedback = nengo.Node(feedback_out, size_out=1)
+		card_sim.input = nengo.Node(card_sim.card_runner.match, size_in=4)
+		card_sim.trial_card = nengo.Node(card_sim.card_runner.get_trial)
+		card_sim.feedback = nengo.Node(feed.feedback_out, size_out=1)
+		card_sim.cc_res = nengo.Node(card_sim.card_runner.cc_res, size_out=vocab.dimensions)
 
-		nengo.Connection(card_runner.feedback, feed.set_feeback)
+		# only accessible for debugging
+		card_sim.feedback_input = nengo.Node(lambda t: card_sim.card_runner.feedback, size_out=1)
+
+		nengo.Connection(card_sim.feedback_input, nengo.Node(feed.set_feeback, size_in=1))
 	return card_sim
