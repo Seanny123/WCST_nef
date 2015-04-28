@@ -56,9 +56,9 @@ class WCST(object):
 				self.deck.append(Card(*card))
 
 		# just in case
-		random.seed(0)
+		#random.seed(0)
 		#ipdb.set_trace()
-		random.shuffle(self.deck)
+		#random.shuffle(self.deck)
 		# in the official task, a deck of 128 cards is used
 		# here we will use 64 cards and extrapolate from there
 		# get the trial card
@@ -102,7 +102,7 @@ class WCST(object):
 		self.pers_run_list = []
 		self.pers_run_flag = True
 
-		self.feedback = False
+		self.feedback = 0.0
 
 	def get_displayed(self, t):
 		"""get the currently displayed cards
@@ -129,7 +129,7 @@ class WCST(object):
 		"""
 		if(t % self.card_step_size == 0.0 and not(self.out_of_cards)):
 			self.selected = Card(*self.disp[np.argmax(selected_vec)])
-			self.feedback = False
+			self.feedback = 0.0
 			print(self.trial)
 			print(self.selected)
 
@@ -140,7 +140,7 @@ class WCST(object):
 			# if matched
 			if(getattr(self.trial, self.rule) == getattr(self.selected, self.rule)):
 				print("MATCHED!")
-				self.feedback = True
+				self.feedback = 1.0
 				self.tot_corr += 1
 				self.run_num += 1
 			else:
@@ -208,7 +208,8 @@ class FeedbackNode(object):
 		if(self.feedback == -1):
 			return 0.0
 		elif(t%self.card_step_size < self.timelimit):
-			if(self.feedback < 1):
+			print(self.feedback)
+			if(self.feedback < 1.0):
 				return self.neg_reward
 			else:
 				return self.pos_reward
@@ -229,5 +230,5 @@ def card_net(vocab):
 		# only accessible for debugging
 		card_sim.feedback_input = nengo.Node(lambda t: card_sim.card_runner.feedback, size_out=1)
 
-		nengo.Connection(card_sim.feedback_input, nengo.Node(feed.set_feeback, size_in=1))
+		nengo.Connection(card_sim.feedback_input, nengo.Node(feed.set_feeback, size_in=1), synapse=None)
 	return card_sim

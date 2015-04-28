@@ -83,7 +83,7 @@ with model:
 	feed_probe = nengo.Probe(cn.feedback_input)
 
 # WHY THE FUCK WOULD CHANING DT CHANGE THE FUCKING RESULT
-sim = nengo.Simulator(model, dt=0.01)
+sim = nengo.Simulator(model, dt=0.001)
 sim.run(2.0)
 
 import matplotlib.pyplot as plt

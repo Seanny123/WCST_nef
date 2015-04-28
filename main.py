@@ -62,15 +62,15 @@ with model:
 	# get the selected card into the card environment
 	nengo.Connection(en.output, cn.input)
 	# send the trial card to circular convolution network
-	nengo.Connection(cn.trial_card, cconv.B)
+	nengo.Connection(cn.trial_card, cconv.B, synapse=None)
 	# send the feedback from the selection to the basal gangila
-	nengo.Connection(cn.feedback, bg.reward_input)
+	nengo.Connection(cn.feedback, bg.reward_input, synapse=None)
 	# hook up the basal ganglia to the gate and the memory selector
-	nengo.Connection(bg.gate_output, fg.gate_in)
+	nengo.Connection(bg.gate_output, fg.gate_in, synapse=None)
 	# connect the memory outputs to the gate
-	nengo.Connection(bg.mem_gate, st.gate)
+	nengo.Connection(bg.mem_gate, st.gate, synapse=None)
 	# connect the trial card result to the memories
-	nengo.Connection(cn.cc_res, st.input)
+	nengo.Connection(cn.cc_res, st.input, synapse=None)
 	# connect memory output to the gate
 	nengo.Connection(st.output, fg.input)
 	nengo.Connection(fg.output, cconv.A)
@@ -81,6 +81,7 @@ with model:
 	#	ovr = override_net()
 
 	# probe the reward, gate, trial and similarity values
+	p_in_r = nengo.Probe(cn.feedback_input)
 	p_reward = nengo.Probe(cn.feedback)
 	p_bg = nengo.Probe(bg.mem_gate)
 	p_gate = nengo.Probe(bg.gate_output)
