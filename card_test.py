@@ -71,7 +71,7 @@ assert(wcst.out_of_cards == True)
 model = nengo.Network(label="reward test")
 
 with model:
-	selected_input = nengo.Node(piecewise({0:[1,0,0,0], 0.6:[0,0,0,1]}))
+	selected_input = nengo.Node(piecewise({0:[0,0,0,1], 0.6:[0,0,1,0]}))
 
 	cn = cards.card_net(vocab)
 	cn.card_runner.deck = [cards.Card("TWO", "TRIANGLE","BLUE")] * 5
@@ -82,12 +82,13 @@ with model:
 	reward_probe = nengo.Probe(cn.feedback)
 	feed_probe = nengo.Probe(cn.feedback_input)
 
-sim = nengo.Simulator(model)
+# WHY THE FUCK WOULD CHANING DT CHANGE THE FUCKING RESULT
+sim = nengo.Simulator(model, dt=0.01)
 sim.run(2.0)
 
 import matplotlib.pyplot as plt
 
 fig = plt.figure()
 plt.plot(sim.trange(), sim.data[reward_probe])
-#plt.plot(sim.trange(), sim.data[feed_probe])
+plt.plot(sim.trange(), sim.data[feed_probe]*0.5)
 plt.show()

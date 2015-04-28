@@ -23,7 +23,7 @@ class FakeBG(object):
 		# if the reward drops from the threshold, change the state
 		if(self.reward_acc > self.threshold):
 			self.crossed = True
-			print("CROSSED")
+			#print("CROSSED")
 		elif(self.reward_acc < self.threshold and self.crossed == True):
 			self.crossed = False
 			self.reward_acc = 0
@@ -33,6 +33,7 @@ class FakeBG(object):
 			self.state[self.state_index] = 1
 		elif(self.reward_acc < 0):
 			self.reward_acc = 0
+
 
 	def mem_gate(self, t):
 		"""only train the memories while receiving reward"""

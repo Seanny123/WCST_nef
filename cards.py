@@ -4,6 +4,8 @@ import nengo.spa
 import numpy as np
 import random
 
+import ipdb
+
 class Card(object):
 	def __init__(self, number, shape, colour):
 		self.shape = shape
@@ -55,13 +57,14 @@ class WCST(object):
 
 		# just in case
 		random.seed(0)
-		random.shuffle(self.deck)
+		#ipdb.set_trace()
+		#random.shuffle(self.deck)
 		# in the official task, a deck of 128 cards is used
 		# here we will use 64 cards and extrapolate from there
 		# get the trial card
 		self.trial = self.deck.pop()
 		#initialize it with a silly value
-		self.selected =  self.trial
+		self.selected = self.trial
 		# Note that another option is to remove cards sharing  2+
 		# attributes with stimulus cards
 		# See Nelson HE: A modified card sorting test sensitive to 
@@ -130,6 +133,10 @@ class WCST(object):
 			print(self.trial)
 			print(self.selected)
 
+			self.logfile.write("Trial:%s\n" %self.trial)
+			self.logfile.write("Selected:%s\n" %self.selected)
+			self.logfile.write("Rule:%s\n" %self.rule)
+
 			# if matched
 			if(getattr(self.trial, self.rule) == getattr(self.selected, self.rule)):
 				print("MATCHED!")
@@ -177,9 +184,6 @@ class WCST(object):
 			else:
 				self.out_of_cards = True
 
-			self.logfile.write("Trial:%s\n" %self.trial)
-			self.logfile.write("Selected:%s\n" %self.selected)
-			self.logfile.write("Rule:%s\n" %self.rule)
 			self.logfile.write("Feedback:%s\n" %self.feedback)
 
 class FeedbackNode(object):
@@ -197,17 +201,17 @@ class FeedbackNode(object):
 		self.pos_reward = pos_reward
 		self.feedback = -1
 
-	def set_feeback(self, t, feedback):
-		self.feedback = feedback
+	def set_feeback(self, t, x):
+		self.feedback = x
 
 	def feedback_out(self, t):
 		if(self.feedback == -1):
 			return 0.0
 		elif(t%self.card_step_size < self.timelimit):
-			if(self.feedback):
-				return self.pos_reward
-			else:
+			if(self.feedback < 1):
 				return self.neg_reward
+			else:
+				return self.pos_reward
 		else:
 				return 0.0
 

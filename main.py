@@ -28,7 +28,7 @@ random.seed(0)
 model = nengo.Network(label="WCST", seed=0)
 
 # everything in direct mode at first
-direct = False
+direct = True
 repeats = True
 if(direct ==  True):
     # Because setting them all to 1 has weird effects
@@ -51,6 +51,7 @@ with model:
 	# rig the deck for testing
 	#cn.card_runner.deck = [cards.Card("TWO", "TRIANGLE","BLUE")] * 1
 	#cn.card_runner.trial = cards.Card("TWO", "TRIANGLE","BLUE")
+	cn.card_runner.deck = cn.card_runner.deck[0:5]
 
 	bg = make_bg(4)
 	en = eval_net(p_neurons, e_neurons, WCST_dimensions, vocab)
@@ -75,11 +76,9 @@ with model:
 	nengo.Connection(fg.output, cconv.A)
 	nengo.Connection(cconv.output, en.input)
 
-"""
-	if(not(repeats)):
-		nr = no_repeats_net()
-		ovr = override_net()
-"""
+	#if(not(repeats)):
+	#	nr = no_repeats_net()
+	#	ovr = override_net()
 
 	# probe the reward, gate, trial and similarity values
 	p_reward = nengo.Probe(cn.feedback)
@@ -87,10 +86,11 @@ with model:
 	p_gate = nengo.Probe(bg.gate_output)
 	p_sim = nengo.Probe(en.output)
 	# is cconv working?
-	p_cconv = nengo.Probe(cconv.output)
+	p_cconv = nengo.Probe(cconv.output, synapse=0.01)
 	# WHY YOU ZERO? BECAUSE TRANSFORM IS ZERO? OH GOD.
 	p_A = nengo.Probe(fg.output)
 	p_B = nengo.Probe(cn.trial_card)
+
 	# a summary of the behaviour will be printed out by the simulation environment
 
 

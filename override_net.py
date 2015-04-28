@@ -8,7 +8,7 @@ class OverrideNetwork(object):
 		self.bad = np.zeros(dimensions)
 		self.normal = np.zeros(dimensions)
 
-	def override(self):
+	def override(self, t, x):
 
 
 # take the similarity input and potentially over-ride it

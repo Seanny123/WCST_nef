@@ -6,3 +6,5 @@ JOB_ID = 0
 
 #the number of dimensions to use in HRR vectors
 VECTOR_DIMENSION = 30
+
+COLOUR_TRANSFORM = vocab.parse('0')
