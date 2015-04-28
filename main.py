@@ -51,7 +51,7 @@ with model:
 	# rig the deck for testing
 	#cn.card_runner.deck = [cards.Card("TWO", "TRIANGLE","BLUE")] * 1
 	#cn.card_runner.trial = cards.Card("TWO", "TRIANGLE","BLUE")
-	cn.card_runner.deck = cn.card_runner.deck[0:5]
+	cn.card_runner.deck = cn.card_runner.deck[0:3]
 
 	bg = make_bg(4)
 	en = eval_net(p_neurons, e_neurons, WCST_dimensions, vocab)

@@ -208,7 +208,6 @@ class FeedbackNode(object):
 		if(self.feedback == -1):
 			return 0.0
 		elif(t%self.card_step_size < self.timelimit):
-			print(self.feedback)
 			if(self.feedback < 1.0):
 				return self.neg_reward
 			else:
