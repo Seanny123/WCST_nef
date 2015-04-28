@@ -4,7 +4,6 @@ from cards import card_net
 from fake_bg import make_bg
 from fake_gate import fake_gate
 from eval_net import eval_net
-from integrator import ea_integrator
 
 WCST_dimensions = 128
 
