@@ -36,14 +36,16 @@ class FakeBG(object):
 		"""only train the memories while receiving reward"""
 		if(self.reward > 0):
 			return_val = np.ones(self.dimensions)
-			return return_val[self.state_index] = 0
+			return_val[self.state_index] = 0
+			return return_val
 		else:
 			return np.ones(self.dimensions)
 
 	def gate_output(self, t):
 		return self.state
 
-def make_bg(dimensions, threshold):
+# dimensions should be renamed...
+def make_bg(dimensions, threshold=1.0):
 	with nengo.Network(label="fake basal_ganglia") as bg:
 		fake_bg = FakeBG(dimensions, threshold)
 		bg.reward_input = nengo.Node(fake_bg.reward_input, size_in=1)

@@ -31,9 +31,9 @@ def super_t(int_neurons, mem_neurons, dimensions, input_scale=1.0, forget_rate=0
 		nengo.Connection(t3.transform.output, s_t.output[2*dimensions:3*dimensions])
 		nengo.Connection(t4.transform.output, s_t.output[3*dimensions:4*dimensions])
 
-		nengo.Connection(s_t.gate[0]. t1.mem_input.gate)
-		nengo.Connection(s_t.gate[1]. t2.mem_input.gate)
-		nengo.Connection(s_t.gate[2]. t3.mem_input.gate)
-		nengo.Connection(s_t.gate[3]. t4.mem_input.gate)
+		nengo.Connection(s_t.gate[0], t1.mem_input.gate)
+		nengo.Connection(s_t.gate[1], t2.mem_input.gate)
+		nengo.Connection(s_t.gate[2], t3.mem_input.gate)
+		nengo.Connection(s_t.gate[3], t4.mem_input.gate)
 
 	return s_t
