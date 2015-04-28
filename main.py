@@ -1,10 +1,13 @@
 import nengo
 import nengo.spa
 from cards import card_net
+import cards
 from fake_bg import make_bg
 from fake_gate import fake_gate
 from eval_net import eval_net
 from transform_net import super_t
+
+import ipdb
 
 WCST_dimensions = 128
 
@@ -25,7 +28,7 @@ vocab.add("FOUR", vocab.parse("ONE*THREE"))
 model = nengo.Network(label="WCST")
 
 # everything in direct mode at first
-direct = True
+direct = False
 if(direct ==  True):
     # Because setting them all to 1 has weird effects
     model.config[nengo.Ensemble].neuron_type = nengo.Direct()
@@ -39,10 +42,15 @@ else:
     e_neurons = 25
     i_neurons = 50
     m_neurons = 50
-    c_neurons = 50*vocab_d # according to Xuan's heuristic
+    # This is the neurons per sub-ensemble because it uses an ensemble array
+    c_neurons = 200 # according to Xuan's and Jan's heuristic
 
 with model:
 	cn = card_net(vocab)
+	# rig the deck for testing
+	cn.card_runner.deck = [cards.Card("TWO", "TRIANGLE","BLUE")] * 1
+	cn.card_runner.trial = cards.Card("TWO", "TRIANGLE","BLUE")
+
 	bg = make_bg(4)
 	en = eval_net(p_neurons, e_neurons, WCST_dimensions, vocab)
 	fg = fake_gate(4, WCST_dimensions)
@@ -71,6 +79,11 @@ with model:
 	p_bg = nengo.Probe(bg.mem_gate)
 	p_gate = nengo.Probe(bg.gate_output)
 	p_sim = nengo.Probe(en.output)
+	# is cconv working?
+	p_cconv = nengo.Probe(cconv.output)
+	# WHY YOU ZERO? BECAUSE TRANSFORM IS ZERO? OH GOD.
+	p_A = nengo.Probe(fg.output)
+	p_B = nengo.Probe(cn.trial_card)
 	# a summary of the behaviour will be printed out by the simulation environment
 
 
@@ -84,9 +97,13 @@ while(cn.card_runner.out_of_cards == False):
 		print("Cards:%s" %len(cn.card_runner.deck))
 	sim.step()
 
-# write out the results
+ipdb.set_trace()
+
+# write out the results # this is not working
 output_file = open("results.txt", "w")
-output_file.write("pers_err:%s" %(float(cn.card_runner.total_pers_error)/float(cn.card_runner.run_num)*100))
+output_file.write("pers_err:%s" %(float(cn.card_runner.total_pers_err)/float(cn.card_runner.run_num)*100))
 output_file.write("categories:%s" %cn.card_runner.cat_num)
 
-ipdb.set_trace()
+import matplotlib.pyplot as plt
+
+plt

@@ -10,36 +10,45 @@ class FakeBG(object):
 		self.state_index = 0
 		self.state[self.state_index] = 1
 		# the accumulated reward
-		self.reward = 0
+		self.reward_acc = 0
+		self.received_reward = 0
 		self.threshold = threshold
 		self.crossed = False
 
 	def reward_input(self, t, x):
 		"""mess with this later"""
-		self.reward += x
+		self.received_reward = x
+		self.reward_acc += x
 		# if the reward passes the threshold, mark it
 		# if the reward drops from the threshold, change the state
-		if(self.reward > self.threshold):
+		if(self.reward_acc > self.threshold):
 			self.crossed = True
 			print("CROSSED")
-		elif(self.reward < self.threshold and self.crossed == True):
+		elif(self.reward_acc < self.threshold and self.crossed == True):
 			self.crossed = False
-			self.reward = 0
+			self.reward_acc = 0
 			# state stuff
 			self.state = np.zeros(self.dimensions)
 			self.state_index = (self.state_index + 1) % self.dimensions
 			self.state[self.state_index] = 1
-		elif(self.reward < 0):
-			self.reward = 0
+		elif(self.reward_acc < 0):
+			self.reward_acc = 0
 
 	def mem_gate(self, t):
 		"""only train the memories while receiving reward"""
-		if(self.reward > 0):
+		if(self.received_reward > 0):
 			return_val = np.ones(self.dimensions)
 			return_val[self.state_index] = 0
 			return return_val
 		else:
 			return np.ones(self.dimensions)
+
+	def override_gate(self, t):
+		"""override the similarity if we've crossed, or we've just started"""
+		if(self.crossed or self.reward_acc == 0):
+			return 1.0
+		else:
+			return 0.0
 
 	def gate_output(self, t):
 		return self.state

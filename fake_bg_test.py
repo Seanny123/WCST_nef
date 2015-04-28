@@ -40,16 +40,23 @@ with model:
 
 	nengo.Connection(reward_input, fg.reward_input)
 
+	reward_probe = nengo.Probe(reward_input)
 	gate_probe = nengo.Probe(fg.gate_output)
+	mem_probe = nengo.Probe(fg.mem_gate)
 	# it seems to be working properly, but maybe also plot the accumulated reward?
 
 sim = nengo.Simulator(model, dt=dt)
 sim.run(6)
 
 fig = plt.figure()
-plt.plot(sim.trange(), sim.data[crossed_probe]*0.5, label="crossed")
+#plt.plot(sim.trange(), sim.data[crossed_probe]*0.5, label="crossed")
 plt.plot(sim.trange(), sim.data[reward_probe], label="reward")
 plt.plot(sim.trange(), sim.data[gate_probe], label="gate")
-plt.ylim(0,2)
+plt.ylim(-1.5,1.5)
 plt.legend()
+fig = plt.figure()
+plt.plot(sim.trange(), sim.data[reward_probe], label="reward")
+plt.plot(sim.trange(), sim.data[mem_probe], label="mem")
+plt.legend()
+plt.ylim(-1.5,1.5)
 plt.show()
