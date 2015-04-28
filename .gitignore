@@ -1,2 +1,4 @@
 *.py[co]
 *.png
+card_log.txt
+results.txt
