@@ -2,6 +2,7 @@ import itertools
 import nengo
 import nengo.spa
 import numpy as np
+import random
 
 class Card(object):
 	def __init__(self, number, shape, colour):
@@ -51,6 +52,10 @@ class WCST(object):
 					break
 			if(found == False):
 				self.deck.append(Card(*card))
+
+		# just in case
+		random.seed(0)
+		random.shuffle(self.deck)
 		# in the official task, a deck of 128 cards is used
 		# here we will use 64 cards and extrapolate from there
 		# get the trial card

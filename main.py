@@ -6,7 +6,7 @@ from fake_bg import make_bg
 from fake_gate import fake_gate
 from eval_net import eval_net
 from transform_net import super_t
-
+import random
 import ipdb
 
 WCST_dimensions = 128
@@ -24,8 +24,8 @@ vocab.add("FOUR", vocab.parse("ONE*THREE"))
 # the dangers of putting our faith in randomness
 
 # Simulate until the card task is finished
-
-model = nengo.Network(label="WCST")
+random.seed(0)
+model = nengo.Network(label="WCST", seed=0)
 
 # everything in direct mode at first
 direct = False
@@ -49,8 +49,8 @@ else:
 with model:
 	cn = card_net(vocab)
 	# rig the deck for testing
-	cn.card_runner.deck = [cards.Card("TWO", "TRIANGLE","BLUE")] * 1
-	cn.card_runner.trial = cards.Card("TWO", "TRIANGLE","BLUE")
+	#cn.card_runner.deck = [cards.Card("TWO", "TRIANGLE","BLUE")] * 1
+	#cn.card_runner.trial = cards.Card("TWO", "TRIANGLE","BLUE")
 
 	bg = make_bg(4)
 	en = eval_net(p_neurons, e_neurons, WCST_dimensions, vocab)
@@ -112,5 +112,3 @@ output_file.write("pers_err:%s" %(float(cn.card_runner.total_pers_err)/float(cn.
 output_file.write("categories:%s" %cn.card_runner.cat_num)
 
 import matplotlib.pyplot as plt
-
-plt
