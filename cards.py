@@ -58,7 +58,7 @@ class WCST(object):
 		# just in case
 		random.seed(0)
 		#ipdb.set_trace()
-		#random.shuffle(self.deck)
+		random.shuffle(self.deck)
 		# in the official task, a deck of 128 cards is used
 		# here we will use 64 cards and extrapolate from there
 		# get the trial card
