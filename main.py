@@ -29,6 +29,7 @@ model = nengo.Network(label="WCST")
 
 # everything in direct mode at first
 direct = False
+repeats = True
 if(direct ==  True):
     # Because setting them all to 1 has weird effects
     model.config[nengo.Ensemble].neuron_type = nengo.Direct()
@@ -73,6 +74,12 @@ with model:
 	nengo.Connection(st.output, fg.input)
 	nengo.Connection(fg.output, cconv.A)
 	nengo.Connection(cconv.output, en.input)
+
+"""
+	if(not(repeats)):
+		nr = no_repeats_net()
+		ovr = override_net()
+"""
 
 	# probe the reward, gate, trial and similarity values
 	p_reward = nengo.Probe(cn.feedback)

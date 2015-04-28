@@ -1,0 +1,12 @@
+Trial:PLUS,YELLOW,FOUR
+Selected:TRIANGLE,RED,ONE
+Rule:colour
+Feedback:False
+Trial:TRIANGLE,BLUE,TWO
+Selected:STAR,GREEN,TWO
+Rule:colour
+Feedback:False
+Trial:TRIANGLE,BLUE,TWO
+Selected:STAR,GREEN,TWO
+Rule:colour
+Feedback:False
