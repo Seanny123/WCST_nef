@@ -26,6 +26,7 @@ class WCST(object):
 		self.vocab = vocab
 		self.card_step_size = card_step_size
 		self.out_of_cards = False
+		self.logfile = open("card_log.txt", "w")
 
 		# initialize card related things
 		colours = ["GREEN", "RED", "YELLOW", "BLUE"]
@@ -170,6 +171,11 @@ class WCST(object):
 				self.trial = self.deck.pop()
 			else:
 				self.out_of_cards = True
+
+			self.logfile.write("Trial:%s\n" %self.trial)
+			self.logfile.write("Selected:%s\n" %self.selected)
+			self.logfile.write("Rule:%s\n" %self.rule)
+			self.logfile.write("Feedback:%s\n" %self.feedback)
 
 class FeedbackNode(object):
 	# how much reward should I give and for how long?
