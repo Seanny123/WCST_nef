@@ -85,8 +85,6 @@ with model:
 
 	reward_probe = nengo.Probe(cn.feedback)
 	feed_probe = nengo.Probe(cn.feedback_input)
-	#c_probe_in = nengo.Probe(cc, "input")
-	#c_probe_out = nengo.Probe(cc, "output")
 	p_bg = nengo.Probe(bg.mem_gate)
 
 sim = nengo.Simulator(model, dt=0.001)
@@ -98,8 +96,6 @@ fig = plt.figure()
 plt.plot(sim.trange(), sim.data[reward_probe], label="reward out")
 plt.plot(sim.trange(), sim.data[feed_probe]*0.5, label="Feed in")
 plt.plot(sim.trange(), sim.data[p_bg], label="mem")
-#plt.plot(sim.trange(), sim.data[c_probe_in], label="Connection_in")
-#plt.plot(sim.trange(), sim.data[c_probe_out], label="Connection_out")
 plt.ylim(-0.2, 1.1)
 plt.legend()
 plt.show()

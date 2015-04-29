@@ -14,11 +14,14 @@ class FakeBG(object):
 		self.received_reward = 0
 		self.threshold = threshold
 		self.crossed = False
+		self.reward_factor = 3.0
+		self.max_reward = 1.0 + 2*self.reward_factor
 
 	def reward_input(self, t, x):
 		"""mess with this later"""
+		# I've arbitrarily chosen a streak of 3 to be ideal, with no actual evidence for this
 		self.received_reward = float(x)
-		self.reward_acc += float(x)
+		self.reward_acc += float(x)/self.reward_factor
 		# if the reward passes the threshold, mark it
 		# if the reward drops from the threshold, change the state
 		if(self.reward_acc > self.threshold):
@@ -33,11 +36,12 @@ class FakeBG(object):
 			self.state[self.state_index] = 1
 		elif(self.reward_acc < 0):
 			self.reward_acc = 0
+		elif(self.reward_acc > self.max_reward):
+			self.reward_acc = self.max_reward
 
 
 	def mem_gate(self, t):
 		"""only train the memories while receiving reward"""
-		print("mem_reward:%s" %self.received_reward)
 		if(self.received_reward > 0):
 			return_val = np.ones(self.dimensions)
 			return_val[self.state_index] = 0

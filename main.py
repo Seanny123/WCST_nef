@@ -73,10 +73,8 @@ with model:
 	nengo.Connection(cn.cc_res, st.input, synapse=None)
 	# connect memory output to the gate
 	nengo.Connection(st.output, fg.input)
-	if(not(direct)):
-		nengo.Connection(fg.output, cconv.A)
-	else:
-		bonus = nengo.Node
+
+	nengo.Connection(fg.output, cconv.A)
 	nengo.Connection(cconv.output, en.input)
 
 	#if(not(repeats)):
@@ -112,6 +110,7 @@ import matplotlib.pyplot as plt
 
 plt.plot(sim.trange(), sim.data[p_in_r]*0.5)
 plt.plot(sim.trange(), sim.data[p_reward])
+plt.ylim(-0.1, 5.1)
 plt.show()
 
 ipdb.set_trace()
@@ -124,4 +123,6 @@ output_file.write("categories:%s" %cn.card_runner.cat_num)
 
 plt.plot(sim.trange(), sim.data[p_A]); plt.show()
 
-plt.plot(sim.trange(), sim.data[p_bg]); plt.show()
+plt.plot(sim.trange(), sim.data[p_bg]); plt.ylim(-0.1, 1.1); plt.show()
+
+plt.plot(sim.trange(), sim.data[p_gate]); plt.ylim(-0.1, 1.1); plt.show()
