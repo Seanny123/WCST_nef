@@ -37,6 +37,7 @@ class FakeBG(object):
 
 	def mem_gate(self, t):
 		"""only train the memories while receiving reward"""
+		print("mem_reward:%s" %self.received_reward)
 		if(self.received_reward > 0):
 			return_val = np.ones(self.dimensions)
 			return_val[self.state_index] = 0

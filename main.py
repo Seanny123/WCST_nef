@@ -60,7 +60,7 @@ with model:
 	cconv = nengo.networks.CircularConvolution(c_neurons, WCST_dimensions)
 
 	# get the selected card into the card environment
-	nengo.Connection(en.output, cn.input)
+	nengo.Connection(en.output, cn.input, synapse=None)
 	# send the trial card to circular convolution network
 	nengo.Connection(cn.trial_card, cconv.B, synapse=None)
 	# send the feedback from the selection to the basal gangila
@@ -73,7 +73,10 @@ with model:
 	nengo.Connection(cn.cc_res, st.input, synapse=None)
 	# connect memory output to the gate
 	nengo.Connection(st.output, fg.input)
-	nengo.Connection(fg.output, cconv.A)
+	if(not(direct)):
+		nengo.Connection(fg.output, cconv.A)
+	else:
+		bonus = nengo.Node
 	nengo.Connection(cconv.output, en.input)
 
 	#if(not(repeats)):
@@ -105,6 +108,12 @@ while(cn.card_runner.out_of_cards == False):
 		print("Cards:%s" %len(cn.card_runner.deck))
 	sim.step()
 
+import matplotlib.pyplot as plt
+
+plt.plot(sim.trange(), sim.data[p_in_r]*0.5)
+plt.plot(sim.trange(), sim.data[p_reward])
+plt.show()
+
 ipdb.set_trace()
 
 # write out the results # this is not working
@@ -112,4 +121,7 @@ output_file = open("results.txt", "w")
 output_file.write("pers_err:%s" %(float(cn.card_runner.total_pers_err)/float(cn.card_runner.run_num)*100))
 output_file.write("categories:%s" %cn.card_runner.cat_num)
 
-import matplotlib.pyplot as plt
+
+plt.plot(sim.trange(), sim.data[p_A]); plt.show()
+
+plt.plot(sim.trange(), sim.data[p_bg]); plt.show()

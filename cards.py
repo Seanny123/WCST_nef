@@ -29,7 +29,7 @@ class WCST(object):
 		self.vocab = vocab
 		self.card_step_size = card_step_size
 		self.out_of_cards = False
-		self.logfile = open("card_log.txt", "w")
+		#self.logfile = open("card_log.txt", "w")
 
 		# initialize card related things
 		colours = ["GREEN", "RED", "YELLOW", "BLUE"]
@@ -56,9 +56,9 @@ class WCST(object):
 				self.deck.append(Card(*card))
 
 		# just in case
-		#random.seed(0)
+		random.seed(0)
 		#ipdb.set_trace()
-		#random.shuffle(self.deck)
+		random.shuffle(self.deck)
 		# in the official task, a deck of 128 cards is used
 		# here we will use 64 cards and extrapolate from there
 		# get the trial card
@@ -133,9 +133,9 @@ class WCST(object):
 			print(self.trial)
 			print(self.selected)
 
-			self.logfile.write("Trial:%s\n" %self.trial)
-			self.logfile.write("Selected:%s\n" %self.selected)
-			self.logfile.write("Rule:%s\n" %self.rule)
+			#self.logfile.write("Trial:%s\n" %self.trial)
+			#self.logfile.write("Selected:%s\n" %self.selected)
+			#self.logfile.write("Rule:%s\n" %self.rule)
 
 			# if matched
 			if(getattr(self.trial, self.rule) == getattr(self.selected, self.rule)):
@@ -160,7 +160,7 @@ class WCST(object):
 					self.persev += 1
 					self.trial_pers_err = 0
 					self.trial_persev = 1
-				if(not(self.feedback)):
+				if(self.feedback == 0.0):
 					# keep track of preservative errors
 					self.tot_pers_err += 1
 					self.trial_pers_err = 1
@@ -184,7 +184,7 @@ class WCST(object):
 			else:
 				self.out_of_cards = True
 
-			self.logfile.write("Feedback:%s\n" %self.feedback)
+			#self.logfile.write("Feedback:%s\n" %self.feedback)
 
 class FeedbackNode(object):
 	# how much reward should I give and for how long?
@@ -199,15 +199,17 @@ class FeedbackNode(object):
 		self.timelimit = timelimit
 		self.neg_reward = neg_reward
 		self.pos_reward = pos_reward
-		self.feedback = -1
+		self.feedback = -1.0
 
 	def set_feeback(self, t, x):
 		self.feedback = x
 
 	def feedback_out(self, t):
-		if(self.feedback == -1):
+		print("actual_reward:%s" %self.feedback)
+		if(self.feedback == -1.0):
 			return 0.0
 		elif(t%self.card_step_size < self.timelimit):
+			#print(self.feedback)
 			if(self.feedback < 1.0):
 				return self.neg_reward
 			else:

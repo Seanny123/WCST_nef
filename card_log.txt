@@ -1,11 +1,12 @@
-Trial:PLUS,BLUE,FOUR
+Trial:CIRCLE,RED,FOUR
+Selected:TRIANGLE,RED,ONE
+Rule:colour
+Feedback:1.0
+Trial:PLUS,BLUE,THREE
 Selected:TRIANGLE,RED,ONE
 Rule:colour
 Feedback:0.0
-Trial:TRIANGLE,BLUE,TWO
-Selected:CIRCLE,BLUE,FOUR
-Rule:colour
-Feedback:1.0
+0
 Trial:TRIANGLE,BLUE,TWO
 Selected:PLUS,YELLOW,THREE
 Rule:colour

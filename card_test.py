@@ -2,6 +2,7 @@ import cards
 import itertools
 import nengo
 import nengo.spa
+from fake_bg import make_bg
 from nengo.utils.functions import piecewise
 import ipdb
 
@@ -68,27 +69,37 @@ assert(wcst.out_of_cards == True)
 
 # test reward timing with a network
 # also tests node functionality
-model = nengo.Network(label="reward test")
+model = nengo.Network(label="reward test", seed=0)
 
 with model:
 	selected_input = nengo.Node(piecewise({0:[0,0,0,1], 0.6:[0,0,1,0]}))
+
+	bg = make_bg(4)
 
 	cn = cards.card_net(vocab)
 	cn.card_runner.deck = [cards.Card("TWO", "TRIANGLE","BLUE")] * 5
 	cn.card_runner.trial = cards.Card("TWO", "TRIANGLE","BLUE")
 
-	nengo.Connection(selected_input, cn.input)
+	cc = nengo.Connection(selected_input, cn.input, synapse=None)
+	nengo.Connection(cn.feedback, bg.reward_input, synapse=None)
 
 	reward_probe = nengo.Probe(cn.feedback)
 	feed_probe = nengo.Probe(cn.feedback_input)
+	#c_probe_in = nengo.Probe(cc, "input")
+	#c_probe_out = nengo.Probe(cc, "output")
+	p_bg = nengo.Probe(bg.mem_gate)
 
-# WHY THE FUCK WOULD CHANING DT CHANGE THE FUCKING RESULT
 sim = nengo.Simulator(model, dt=0.001)
 sim.run(2.0)
 
 import matplotlib.pyplot as plt
 
 fig = plt.figure()
-plt.plot(sim.trange(), sim.data[reward_probe])
-plt.plot(sim.trange(), sim.data[feed_probe]*0.5)
+plt.plot(sim.trange(), sim.data[reward_probe], label="reward out")
+plt.plot(sim.trange(), sim.data[feed_probe]*0.5, label="Feed in")
+plt.plot(sim.trange(), sim.data[p_bg], label="mem")
+#plt.plot(sim.trange(), sim.data[c_probe_in], label="Connection_in")
+#plt.plot(sim.trange(), sim.data[c_probe_out], label="Connection_out")
+plt.ylim(-0.2, 1.1)
+plt.legend()
 plt.show()

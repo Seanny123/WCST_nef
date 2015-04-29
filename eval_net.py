@@ -27,14 +27,14 @@ def eval_net(p_neurons, e_neurons, dimensions, vocab):
 		res_blue = nengo.Ensemble(e_neurons, 1)
 
 		# connect inputs
-		nengo.Connection(e_n.input, prod_red.A)
-		nengo.Connection(red_node, prod_red.B)
-		nengo.Connection(e_n.input, prod_green.A)
-		nengo.Connection(green_node, prod_green.B)
-		nengo.Connection(e_n.input, prod_yellow.A)
-		nengo.Connection(yellow_node, prod_yellow.B)
-		nengo.Connection(e_n.input, prod_blue.A)
-		nengo.Connection(blue_node, prod_blue.B)
+		nengo.Connection(e_n.input, prod_red.A, synapse=None)
+		nengo.Connection(red_node, prod_red.B, synapse=None)
+		nengo.Connection(e_n.input, prod_green.A, synapse=None)
+		nengo.Connection(green_node, prod_green.B, synapse=None)
+		nengo.Connection(e_n.input, prod_yellow.A, synapse=None)
+		nengo.Connection(yellow_node, prod_yellow.B, synapse=None)
+		nengo.Connection(e_n.input, prod_blue.A, synapse=None)
+		nengo.Connection(blue_node, prod_blue.B, synapse=None)
 
 		# connect outputs
 		nengo.Connection(prod_red.output, res_red, transform=nengo.networks.product.dot_product_transform(dimensions))
