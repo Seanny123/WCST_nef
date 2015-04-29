@@ -128,7 +128,7 @@ class WCST(object):
 			I adapted this from the PEBL scoring method in cardsort64.pbl
 		"""
 		if(t % self.card_step_size == 0.0 and not(self.out_of_cards)):
-			self.selected = Card(*self.disp[np.argmax(selected_vec)])
+			self.selected = Card(*self.disp[np.argmax(np.array(selected_vec))])
 			self.feedback = 0.0
 			print(self.trial)
 			print(self.selected)
@@ -202,10 +202,9 @@ class FeedbackNode(object):
 		self.feedback = -1.0
 
 	def set_feeback(self, t, x):
-		self.feedback = x
+		self.feedback = float(x)
 
 	def feedback_out(self, t):
-		print("actual_reward:%s" %self.feedback)
 		if(self.feedback == -1.0):
 			return 0.0
 		elif(t%self.card_step_size < self.timelimit):

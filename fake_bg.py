@@ -17,8 +17,8 @@ class FakeBG(object):
 
 	def reward_input(self, t, x):
 		"""mess with this later"""
-		self.received_reward = x
-		self.reward_acc += x
+		self.received_reward = float(x)
+		self.reward_acc += float(x)
 		# if the reward passes the threshold, mark it
 		# if the reward drops from the threshold, change the state
 		if(self.reward_acc > self.threshold):
