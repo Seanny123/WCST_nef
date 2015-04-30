@@ -1,3 +1,5 @@
+# get data for the report
+
 import nengo
 import nengo.spa
 from cards import card_net
@@ -28,7 +30,7 @@ random.seed(0)
 model = nengo.Network(label="WCST", seed=0)
 
 # everything in direct mode at first
-direct = True
+direct = False
 repeats = True
 if(direct ==  True):
     # Because setting them all to 1 has weird effects
@@ -92,37 +94,3 @@ with model:
 	# WHY YOU ZERO? BECAUSE TRANSFORM IS ZERO? OH GOD.
 	p_A = nengo.Probe(fg.output)
 	p_B = nengo.Probe(cn.trial_card)
-
-	# a summary of the behaviour will be printed out by the simulation environment
-
-
-sim = nengo.Simulator(model)
-step_count = 0
-print("Simulating")
-while(cn.card_runner.out_of_cards == False):
-	step_count += 1
-	if(step_count % 1000 == 0):
-		print("Step:%s" %step_count)
-		print("Cards:%s" %len(cn.card_runner.deck))
-	sim.step()
-
-import matplotlib.pyplot as plt
-
-plt.plot(sim.trange(), sim.data[p_in_r]*0.5)
-plt.plot(sim.trange(), sim.data[p_reward])
-plt.ylim(-0.1, 5.1)
-plt.show()
-
-ipdb.set_trace()
-
-# write out the results # this is not working
-output_file = open("results.txt", "w")
-output_file.write("pers_err:%s" %(float(cn.card_runner.total_pers_err)/float(cn.card_runner.run_num)*100))
-output_file.write("categories:%s" %cn.card_runner.cat_num)
-
-
-plt.plot(sim.trange(), sim.data[p_A]); plt.show()
-
-plt.plot(sim.trange(), sim.data[p_bg]); plt.ylim(-0.1, 1.1); plt.show()
-
-plt.plot(sim.trange(), sim.data[p_gate]); plt.ylim(-0.1, 1.1); plt.show()

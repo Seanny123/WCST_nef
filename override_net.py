@@ -15,7 +15,7 @@ class OverrideNetwork(object):
 		return_val[np.argmax(self.normal)] = 1
 		return return_val
 
-
+learn_trans
 
 
 # take the similarity input and potentially over-ride it

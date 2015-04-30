@@ -34,7 +34,7 @@ with nengo.Network(label="class test") as net:
 	p_out = nengo.Probe(net.output)
  
 sim = nengo.Simulator(net)
-sim.run(1)
+sim.run(0.5)
  
 import matplotlib.pyplot as plt
  

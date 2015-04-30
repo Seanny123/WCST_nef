@@ -21,10 +21,10 @@ def eval_net(p_neurons, e_neurons, dimensions, vocab):
 		prod_blue = nengo.networks.Product(p_neurons, dimensions=dimensions)
 
 		# four results (could these just be nodes?)
-		res_red = nengo.Ensemble(e_neurons, 1)
-		res_green = nengo.Ensemble(e_neurons, 1)
-		res_yellow = nengo.Ensemble(e_neurons, 1)
-		res_blue = nengo.Ensemble(e_neurons, 1)
+		res_red = nengo.Node(size_out=1)
+		res_green = nengo.Node(size_out=1)
+		res_yellow = nengo.Node(size_out=1)
+		res_blue = nengo.Node(size_out=1)
 
 		# connect inputs
 		nengo.Connection(e_n.input, prod_red.A, synapse=None)
@@ -38,13 +38,13 @@ def eval_net(p_neurons, e_neurons, dimensions, vocab):
 
 		# connect outputs
 		nengo.Connection(prod_red.output, res_red, transform=nengo.networks.product.dot_product_transform(dimensions))
-		nengo.Connection(res_red, e_n.output[0], synapse=0.05)
+		nengo.Connection(res_red, e_n.output[0], synapse=None)
 		nengo.Connection(prod_green.output, res_green, transform=nengo.networks.product.dot_product_transform(dimensions))
-		nengo.Connection(res_green, e_n.output[1], synapse=0.05)
+		nengo.Connection(res_green, e_n.output[1], synapse=None)
 		nengo.Connection(prod_yellow.output, res_yellow, transform=nengo.networks.product.dot_product_transform(dimensions))
-		nengo.Connection(res_yellow, e_n.output[2], synapse=0.05)
+		nengo.Connection(res_yellow, e_n.output[2], synapse=None)
 		nengo.Connection(prod_blue.output, res_blue, transform=nengo.networks.product.dot_product_transform(dimensions))
-		nengo.Connection(res_blue, e_n.output[3], synapse=0.05)
+		nengo.Connection(res_blue, e_n.output[3], synapse=None)
 
 	# return network
 	return e_n
