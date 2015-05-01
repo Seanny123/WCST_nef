@@ -15,7 +15,7 @@ class FakeBG(object):
 		self.threshold = threshold
 		self.crossed = False
 		self.reward_factor = 3.0
-		self.max_reward = 1.0 + 2*self.reward_factor
+		self.max_reward = 1.0 + 2*1.0/self.reward_factor
 
 	def reward_input(self, t, x):
 		"""mess with this later"""
