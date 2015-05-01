@@ -83,6 +83,8 @@ with model:
 	p_am = nengo.Probe(am.output, synapse=0.05)
 	p_sim = nengo.Probe(en.output, synapse=0.05)
 
+ipdb.set_trace()
+
 sim = nengo.Simulator(model)
 sim.run(0.3)
 

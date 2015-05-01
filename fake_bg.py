@@ -21,7 +21,10 @@ class FakeBG(object):
 		"""mess with this later"""
 		# I've arbitrarily chosen a streak of 3 to be ideal, with no actual evidence for this
 		self.received_reward = float(x)
-		self.reward_acc += float(x)/self.reward_factor
+		if(crossed):
+			self.reward_acc += float(x)
+		else:
+			self.reward_acc += float(x)/self.reward_factor
 		# if the reward passes the threshold, mark it
 		# if the reward drops from the threshold, change the state
 		if(self.reward_acc > self.threshold):
