@@ -2,14 +2,13 @@
 
 import nengo
 import nengo.spa
-from cards import card_net
 import cards
-from fake_bg import make_bg
-from fake_gate import fake_gate
 from eval_net import eval_net
-from transform_net import super_t
+from transform_net import transform_net
 import random
 import ipdb
+import numpy as np
+from nengo.utils.functions import piecewise
 
 WCST_dimensions = 128
 
@@ -20,77 +19,80 @@ vocab.add("TWO", vocab.parse("ONE*ONE"))
 vocab.add("THREE", vocab.parse("ONE*TWO"))
 vocab.add("FOUR", vocab.parse("ONE*THREE"))
 
-# prove that neurally this stuff works
-# first with rigged training case
-# then see how long it takes for it to find that first rule
-# the dangers of putting our faith in randomness
+tmp = cards.WCST(vocab)
 
-# Simulate until the card task is finished
+red_trial = vocab.parse("NUMBER*ONE + SHAPE*CIRCLE + COLOUR*RED")
+green_trial = vocab.parse("NUMBER*ONE + SHAPE*CIRCLE + COLOUR*GREEN")
+
+yellow_1 = vocab.parse("NUMBER*ONE + SHAPE*TRIANGLE + COLOUR*YELLOW")
+yellow_2 = vocab.parse("NUMBER*TWO + SHAPE*PLUS + COLOUR*YELLOW")
+
+blue_1 = vocab.parse("NUMBER*TWO + SHAPE*PLUS + COLOUR*BLUE")
+blue_2 = vocab.parse("NUMBER*THREE + SHAPE*STAR + COLOUR*BLUE")
+
+green_1 = vocab.parse("NUMBER*FOUR + SHAPE*PLUS + COLOUR*GREEN")
+green_2 = vocab.parse("NUMBER*ONE + SHAPE*STAR + COLOUR*GREEN")
+
+yellow_feedback = yellow_2*~(yellow_1) + yellow_1*~(yellow_2)
+blue_feedback = blue_2*~(blue_1) + blue_1*~(blue_2)
+green_feedback = green_2*~(green_1) + green_1*~(green_2)
+
+
+colours = ["GREEN", "RED", "YELLOW", "BLUE"]
+numbers = ["ONE", "TWO", "THREE", "FOUR"]
+shapes = ["STAR", "CIRCLE", "TRIANGLE", "PLUS"]
+
+cleanup_pairs = []
+for c in colours:
+	cleanup_pairs.append(vocab.parse("COLOUR*%s" %(c)).v)
+for n in numbers:
+	cleanup_pairs.append(vocab.parse("NUMBER*%s" %(n)).v)
+for s in shapes:
+	cleanup_pairs.append(vocab.parse("NUMBER*%s" %(s)).v)
+
 random.seed(0)
 model = nengo.Network(label="WCST", seed=0)
 
-# everything in direct mode at first
-direct = False
-repeats = True
-if(direct ==  True):
-    # Because setting them all to 1 has weird effects
-    model.config[nengo.Ensemble].neuron_type = nengo.Direct()
-    p_neurons = 5
-    e_neurons = 5 #not used
-    i_neurons = 5
-    m_neurons = 5
-    c_neurons = 10
-else:
-    p_neurons = 50
-    e_neurons = 25 #not used
-    i_neurons = 50
-    m_neurons = 50
-    # This is the neurons per sub-ensemble because it uses an ensemble array
-    c_neurons = 200 # according to Xuan's and Jan's heuristic
+p_neurons = 50
+i_neurons = 50
+m_neurons = 50
+# This is the neurons per sub-ensemble because it uses an ensemble array
+c_neurons = 200 # according to Xuan's and Jan's heuristic
 
 with model:
-	cn = card_net(vocab)
-	# rig the deck for testing
-	#cn.card_runner.deck = [cards.Card("TWO", "TRIANGLE","BLUE")] * 1
-	#cn.card_runner.trial = cards.Card("TWO", "TRIANGLE","BLUE")
-	#cn.card_runner.deck = cn.card_runner.deck[0:3]
+	# show with the red card, if that works, switch to green
+	trial_card = nengo.Node(piecewise({0:green_trial.v}), size_out=WCST_dimensions)
+	#trans_input = nengo.Node(piecewise({0:yellow_feedback.v, 0.3:blue_feedback.v, 0.6:green_feedback.v}), size_out=WCST_dimensions)
+	trans_input = nengo.Node(vocab.parse('0').v)
 
-	bg = make_bg(4)
-	en = eval_net(p_neurons, e_neurons, WCST_dimensions, vocab)
-	fg = fake_gate(4, WCST_dimensions)
-	st = super_t(i_neurons, m_neurons, WCST_dimensions, input_scale=0.4, forget_rate=0.2, step_size=0.2, diff_gain=1.0)
+	en = eval_net(p_neurons, WCST_dimensions, vocab)
+	t_net = transform_net(i_neurons, m_neurons, WCST_dimensions, input_scale=0.4, forget_rate=0.2, step_size=0.2, diff_gain=1.0)
+	am = nengo.spa.AssociativeMemory(cleanup_pairs, default_output_vector=vocab.identity.v, n_neurons_per_ensemble=50)
 	cconv = nengo.networks.CircularConvolution(c_neurons, WCST_dimensions)
 
-	# get the selected card into the card environment
-	nengo.Connection(en.output, cn.input, synapse=None)
 	# send the trial card to circular convolution network
-	nengo.Connection(cn.trial_card, cconv.B, synapse=None)
-	# send the feedback from the selection to the basal gangila
-	nengo.Connection(cn.feedback, bg.reward_input, synapse=None)
-	# hook up the basal ganglia to the gate and the memory selector
-	nengo.Connection(bg.gate_output, fg.gate_in, synapse=None)
-	# connect the memory outputs to the gate
-	nengo.Connection(bg.mem_gate, st.gate, synapse=None)
-	# connect the trial card result to the memories
-	nengo.Connection(cn.cc_res, st.input, synapse=None)
-	# connect memory output to the gate
-	nengo.Connection(st.output, fg.input)
-
-	nengo.Connection(fg.output, cconv.A)
+	nengo.Connection(trial_card, cconv.B, synapse=None)
+	# trans_feedback into memory
+	nengo.Connection(trans_input, t_net.mem_input.input, synapse=None)
+	#nengo.Connection(trans_input, t_net.transform.input, synapse=None)
+	#ipdb.set_trace()
+	nengo.Connection(t_net.trans.output, am.input)
+	nengo.Connection(am.output, cconv.A)
 	nengo.Connection(cconv.output, en.input)
 
-	#if(not(repeats)):
-	#	nr = no_repeats_net()
-	#	ovr = override_net()
+	p_am = nengo.Probe(am.output, synapse=0.05)
+	p_sim = nengo.Probe(en.output, synapse=0.05)
 
-	# probe the reward, gate, trial and similarity values
-	p_in_r = nengo.Probe(cn.feedback_input)
-	p_reward = nengo.Probe(cn.feedback)
-	p_bg = nengo.Probe(bg.mem_gate)
-	p_gate = nengo.Probe(bg.gate_output)
-	p_sim = nengo.Probe(en.output)
-	# is cconv working?
-	p_cconv = nengo.Probe(cconv.output, synapse=0.01)
-	# WHY YOU ZERO? BECAUSE TRANSFORM IS ZERO? OH GOD.
-	p_A = nengo.Probe(fg.output)
-	p_B = nengo.Probe(cn.trial_card)
+sim = nengo.Simulator(model)
+sim.run(0.3)
+
+
+import matplotlib.pyplot as plt
+
+fig = plt.figure(); plt.plot(sim.trange(), sim.data[p_sim]); plt.legend(["red","green","yellow","blue"]); plt.show()
+
+ipdb.set_trace()
+
+# run with different differential gains
+
+# run with different learning rates

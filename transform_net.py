@@ -5,8 +5,8 @@ from integrator import ea_integrator
 def transform_net(int_neurons, mem_neurons, dimensions, input_scale=1.0, forget_rate=0.0, step_size=1.0, diff_gain=1.0):
 	with nengo.Network(label="transform") as t_n:
 		t_n.mem_input = nengo.networks.workingmemory.InputGatedMemory(mem_neurons, dimensions, difference_gain=diff_gain)
-		t_n.transform = ea_integrator(int_neurons, dimensions, input_scale, forget_rate, step_size)
-		nengo.Connection(t_n.mem_input.output, t_n.transform.input)
+		t_n.trans = ea_integrator(int_neurons, dimensions, input_scale, forget_rate, step_size)
+		nengo.Connection(t_n.mem_input.output, t_n.trans.input)
 	return t_n
 
 def super_t(int_neurons, mem_neurons, dimensions, input_scale=1.0, forget_rate=0.0, step_size=1.0, diff_gain=1.0):
@@ -26,10 +26,10 @@ def super_t(int_neurons, mem_neurons, dimensions, input_scale=1.0, forget_rate=0
 		nengo.Connection(s_t.input, t3.mem_input.input)
 		nengo.Connection(s_t.input, t4.mem_input.input)
 
-		nengo.Connection(t1.transform.output, s_t.output[0:dimensions])
-		nengo.Connection(t2.transform.output, s_t.output[dimensions:2*dimensions])
-		nengo.Connection(t3.transform.output, s_t.output[2*dimensions:3*dimensions])
-		nengo.Connection(t4.transform.output, s_t.output[3*dimensions:4*dimensions])
+		nengo.Connection(t1.trans.output, s_t.output[0:dimensions])
+		nengo.Connection(t2.trans.output, s_t.output[dimensions:2*dimensions])
+		nengo.Connection(t3.trans.output, s_t.output[2*dimensions:3*dimensions])
+		nengo.Connection(t4.trans.output, s_t.output[3*dimensions:4*dimensions])
 
 		nengo.Connection(s_t.gate[0], t1.mem_input.gate)
 		nengo.Connection(s_t.gate[1], t2.mem_input.gate)

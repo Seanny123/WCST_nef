@@ -117,7 +117,7 @@ class WCST(object):
 		return self.vocab.parse(self.trial.get_spa()).v
 
 	def cc_res(self, t):
-		return self.vocab.parse(  "%s*~(%s)" %( self.trial.get_spa(),self.selected.get_spa() )  ).v
+		return self.vocab.parse(  "%s*~(%s) + %s*~(%s)" %( self.trial.get_spa(),self.selected.get_spa(),self.trial.get_spa(),self.selected.get_spa() )  ).v
 
 	def match(self, t, selected_vec):
 		"""score the match, this is the method that synchronizes the whole network artificially

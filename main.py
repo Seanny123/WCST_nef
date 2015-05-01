@@ -58,6 +58,7 @@ with model:
 	fg = fake_gate(4, WCST_dimensions)
 	st = super_t(i_neurons, m_neurons, WCST_dimensions, input_scale=0.4, forget_rate=0.2, step_size=0.2, diff_gain=1.0)
 	cconv = nengo.networks.CircularConvolution(c_neurons, WCST_dimensions)
+	am = nengo.spa.AssociativeMemory(cleanup_pairs, default_output_vector=vocab.identity.v, n_neurons_per_ensemble=50)
 
 	# get the selected card into the card environment
 	nengo.Connection(en.output, cn.input, synapse=None)
@@ -74,7 +75,8 @@ with model:
 	# connect memory output to the gate
 	nengo.Connection(st.output, fg.input)
 
-	nengo.Connection(fg.output, cconv.A)
+	nengo.Connection(fg.output, am.input)
+	nengo.Connection(am.output, cconv.A)
 	nengo.Connection(cconv.output, en.input)
 
 	#if(not(repeats)):
@@ -110,14 +112,14 @@ import matplotlib.pyplot as plt
 
 plt.plot(sim.trange(), sim.data[p_in_r]*0.5)
 plt.plot(sim.trange(), sim.data[p_reward])
-plt.ylim(-0.1, 5.1)
+plt.ylim(-0.1, 1.5)
 plt.show()
 
 ipdb.set_trace()
 
 # write out the results # this is not working
 output_file = open("results.txt", "w")
-output_file.write("pers_err:%s" %(float(cn.card_runner.total_pers_err)/float(cn.card_runner.run_num)*100))
+output_file.write("pers_err:%s" %(float(cn.card_runner.tot_pers_err)/float(cn.card_runner.run_num)*100))
 output_file.write("categories:%s" %cn.card_runner.cat_num)
 
 
@@ -125,4 +127,4 @@ plt.plot(sim.trange(), sim.data[p_A]); plt.show()
 
 plt.plot(sim.trange(), sim.data[p_bg]); plt.ylim(-0.1, 1.1); plt.show()
 
-plt.plot(sim.trange(), sim.data[p_gate]); plt.ylim(-0.1, 1.1); plt.show()
+plt.plot(sim.trange(), sim.data[p_in_r]*0.5); plt.ylim(-0.1, 1.1); plt.plot(sim.trange(), sim.data[p_reward]); plt.legend(["cat 1", "cat 2", "cat 3", "cat 4", "reward"]); plt.show()
