@@ -18,6 +18,18 @@ vocab.add("TWO", vocab.parse("ONE*ONE"))
 vocab.add("THREE", vocab.parse("ONE*TWO"))
 vocab.add("FOUR", vocab.parse("ONE*THREE"))
 
+colours = ["GREEN", "RED", "YELLOW", "BLUE"]
+numbers = ["ONE", "TWO", "THREE", "FOUR"]
+shapes = ["STAR", "CIRCLE", "TRIANGLE", "PLUS"]
+
+cleanup_pairs = []
+for c in colours:
+	cleanup_pairs.append(vocab.parse("COLOUR*%s" %(c)).v)
+for n in numbers:
+	cleanup_pairs.append(vocab.parse("NUMBER*%s" %(n)).v)
+for s in shapes:
+	cleanup_pairs.append(vocab.parse("NUMBER*%s" %(s)).v)
+
 # prove that neurally this stuff works
 # first with rigged training case
 # then see how long it takes for it to find that first rule
@@ -54,7 +66,7 @@ with model:
 	#cn.card_runner.deck = cn.card_runner.deck[0:3]
 
 	bg = make_bg(4)
-	en = eval_net(p_neurons, e_neurons, WCST_dimensions, vocab)
+	en = eval_net(p_neurons, WCST_dimensions, vocab)
 	fg = fake_gate(4, WCST_dimensions)
 	st = super_t(i_neurons, m_neurons, WCST_dimensions, input_scale=0.4, forget_rate=0.2, step_size=0.2, diff_gain=1.0)
 	cconv = nengo.networks.CircularConvolution(c_neurons, WCST_dimensions)
