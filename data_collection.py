@@ -63,7 +63,7 @@ def get_model(diff_gain=1.0, forget_rate=0.2, seed=0):
 
 	with model:
 		# show with the red card, if that works, switch to green
-		trial_card = nengo.Node(piecewise({0:red_trial.v}), size_out=WCST_dimensions)
+		trial_card = nengo.Node(piecewise({0:green_trial.v}), size_out=WCST_dimensions)
 		trans_input = nengo.Node(piecewise({0:yellow_feedback.v, 0.3:blue_feedback.v, 0.6:green_feedback.v}), size_out=WCST_dimensions)
 		#trans_input = nengo.Node(vocab.parse('0').v)
 
@@ -88,7 +88,6 @@ def get_model(diff_gain=1.0, forget_rate=0.2, seed=0):
 def get_measures(res, time_list):
 	final_diff = {}
 	for t in time_list:
-		time_val
 		diff_max = np.sort(res[t/0.001,:])[-1] - np.sort(res[t/0.001,:])[-2]
 		green_diff = np.sort(res[t/0.001,:])[-1] - res[t/0.001,:][1]
 
@@ -98,20 +97,21 @@ def get_measures(res, time_list):
 			final_diff[t] = -green_diff
 	return final_diff
 
-model, p_sim = get_model()
-sim = nengo.Simulator(model)
-sim.run(0.6)
+#model, p_sim = get_model()
+#sim = nengo.Simulator(model)
+#sim.run(0.6)
 
-import matplotlib.pyplot as plt
-plt.plot(sim.trange(), sim.data[p_sim])
-plt.legend(["red","green","yellow","blue"])
-plt.show()
+#import matplotlib.pyplot as plt
+#plt.plot(sim.trange(), sim.data[p_sim])
+#plt.legend(["red","green","yellow","blue"])
+#plt.show()
 
-ipdb.set_trace()
+#ipdb.set_trace()
 
-run_time = 0.01
+run_time = 0.9
 
 time_list = [0.29, 0.59, 0.89]
+#time_list = [0.008]
 
 for seeds in range(5):
 	for forget_rate in [0.15, 0.2, 0.25]:
@@ -120,7 +120,7 @@ for seeds in range(5):
 		sim.run(run_time)
 		forget_file = open("forget_results.txt", "a")
 		final_diff = get_measures(sim.data[p_sim], time_list)
-		forget_file.write("final:%s\n" %(final_diff,))
+		forget_file.write("rate;%s;final;%s\n" %(forget_rate, final_diff,))
 		forget_file.close()
 
 	for diff_gain in [0.5, 1.0, 1.5]:
@@ -129,7 +129,5 @@ for seeds in range(5):
 		sim.run(run_time)
 		gain_file = open("gain_results.txt", "a")
 		final_diff = get_measures(sim.data[p_sim], time_list)
-		gain_file.write("final:%s\n" %(final_diff,))
+		gain_file.write("gain;%s;final;%s\n" %(diff_gain, final_diff,))
 		gain_file.close()
-
-
