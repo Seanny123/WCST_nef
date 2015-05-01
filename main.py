@@ -87,9 +87,9 @@ with model:
 	# connect memory output to the gate
 	nengo.Connection(st.output, fg.input)
 
-	nengo.Connection(fg.output, am.input)
-	nengo.Connection(am.output, cconv.A)
-	nengo.Connection(cconv.output, en.input)
+	nengo.Connection(fg.output, cconv.A)
+	nengo.Connection(cconv.output, am.input)
+	nengo.Connection(am.output, en.input)
 
 	#if(not(repeats)):
 	#	nr = no_repeats_net()
@@ -139,4 +139,4 @@ plt.plot(sim.trange(), sim.data[p_A]); plt.show()
 
 plt.plot(sim.trange(), sim.data[p_bg]); plt.ylim(-0.1, 1.1); plt.show()
 
-plt.plot(sim.trange(), sim.data[p_in_r]*0.5); plt.ylim(-0.1, 1.1); plt.plot(sim.trange(), sim.data[p_reward]); plt.legend(["cat 1", "cat 2", "cat 3", "cat 4", "reward"]); plt.show()
+plt.plot(sim.trange(), sim.data[p_gate]*0.5); plt.plot(sim.trange(), sim.data[p_in_r]*0.5); plt.ylim(-0.1, 1.1); plt.legend(["cat 1", "cat 2", "cat 3", "cat 4", "reward"]); plt.show()
