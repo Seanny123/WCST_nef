@@ -1,8 +1,0 @@
-Before recompiling:
-multiplied two (1000,1000) matrices in 445.2 ms
-dotted two (4000) vectors in 15.84 us
-SVD of (2000,1000) matrix in 7.187 s
-Eigendecomp of (1500,1500) matrix in 21.321 s
-
-After compiling with BLAS from source:
-
